@@ -51,4 +51,9 @@ class Paste extends Model
     {
         return $this->hasMany(PasteAccessLog::class);
     }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(PasteComment::class);
+    }
 }
