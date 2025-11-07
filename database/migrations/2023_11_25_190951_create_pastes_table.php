@@ -24,8 +24,6 @@ return new class extends Migration
             $table->timestamp('expiration')->nullable()->index();
             $table->boolean('destroy_on_open')->default(false);
             $table->timestamp('created_at');
-
-            $table->fullText(['title', 'tags']);
         });
     }
 
