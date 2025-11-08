@@ -12,6 +12,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('label', 35)->unique();
             $table->string('value', 25)->unique();
+
+            $table->softDeletes();
         });
     }
 
