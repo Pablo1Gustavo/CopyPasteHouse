@@ -9,11 +9,21 @@ class CommaSeparatedStringListCast implements CastsAttributes
 {
     public function get(Model $model, string $key, $value, array $attributes): ?array
     {
-        return is_null($value) ? null : explode(',', $value) ;
+        if (is_null($value))
+        {
+            return null;
+        }
+        $array = explode(',', $value);
+        return array_slice($array, 1, -1);
     }
 
     public function set(Model $model, string $key, $value, array $attributes): ?string
     {
-        return is_array($value) ? implode(',', $value) : null;
+        if (!is_array($value))
+        {
+            return null;
+        }
+        sort($value);
+        return ',' . implode(',', $value) . ',';
     }
 }
