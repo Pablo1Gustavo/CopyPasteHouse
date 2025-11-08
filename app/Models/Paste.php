@@ -24,6 +24,9 @@ class Paste extends Model
         'expiration',
         'destroy_on_open'
     ];
+    protected $hidden = [
+        'password'
+    ];
     protected $casts = [
         'tags'            => CommaSeparatedStringListCast::class,
         'created_at'      => 'datetime',
