@@ -8,6 +8,7 @@ use App\Models\{Paste, User};
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\{DB, Hash};
+use Illuminate\Support\Str;
 
 class PasteService
 {
@@ -43,8 +44,12 @@ class PasteService
 
         if (isset($filters['tags']))
         {
-            sort($filters['tags']);
-            $pattern = '%,' . implode(',%,', $filters['tags']) . ',%';
+            $tags = $filters['tags'];
+            $tags = array_filter($tags, fn ($item) => !empty($item));
+            $tags = array_map(Str::slug(...), $tags);
+            $tags = array_unique($tags);
+
+            $pattern = '%,' . implode(',%,', $tags) . ',%';
             $query->where('tags', 'LIKE', $pattern);
         }
 
