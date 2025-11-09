@@ -9,7 +9,7 @@
 <body class="bg-gray-900 text-white">
     <div class="bg-gray-800 py-4 px-4 mb-8">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <h1 class="text-2xl font-bold">CopyPasteHouse</h1>
+            <a href="{{ route('pastes.create') }}" class="text-2xl font-bold text-white hover:text-gray-300">CopyPasteHouse</a>
             <div class="flex items-center gap-4 text-sm">
                 <a href="{{ route('login') }}" class="text-gray-300 hover:text-white">Login</a>
                 <a href="{{ route('register') }}" class="text-gray-300 hover:text-white">Sign up</a>

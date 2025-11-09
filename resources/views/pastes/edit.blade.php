@@ -10,9 +10,9 @@
     <!-- Header -->
     <div class="bg-gray-800 py-4 px-4 mb-8">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <h1 class="text-xl font-bold">CopyPasteHouse</h1>
+            <a href="{{ route('pastes.create') }}" class="text-xl font-bold text-white hover:text-gray-300">CopyPasteHouse</a>
             <div class="flex items-center gap-4 text-sm">
-                <a href="{{ route('dashboard') }}" class="border border-green-500 text-green-500 px-4 py-2 hover:bg-green-500 hover:text-white transition">
+                <a href="{{ route('pastes.create') }}" class="border border-green-500 text-green-500 px-4 py-2 hover:bg-green-500 hover:text-white transition">
                     + NEW PASTE
                 </a>
                 <a href="{{ route('pastes.index') }}" class="border border-gray-400 px-4 py-2 hover:bg-gray-700 transition">

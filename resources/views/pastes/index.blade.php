@@ -10,9 +10,9 @@
     <!-- Header -->
     <div class="bg-gray-800 py-4 px-4 mb-8">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <h1 class="text-2xl font-bold">CopyPasteHouse</h1>
+            <a href="{{ route('pastes.create') }}" class="text-2xl font-bold text-white hover:text-gray-300">CopyPasteHouse</a>
             <div class="flex items-center gap-4 text-sm">
-                <a href="{{ route('dashboard') }}" class="border border-green-500 text-green-500 px-4 py-2 hover:bg-green-500 hover:text-white transition uppercase">
+                <a href="{{ route('pastes.create') }}" class="border border-green-500 text-green-500 px-4 py-2 hover:bg-green-500 hover:text-white transition uppercase">
                     + New Paste
                 </a>
                 <a href="{{ route('pastes.index') }}" class="border border-gray-400 px-4 py-2 hover:bg-gray-700 transition uppercase">
@@ -42,7 +42,7 @@
         @if($pastes->isEmpty())
             <div class="bg-gray-800 rounded-lg p-12 text-center text-gray-400">
                 <p class="mb-4">You haven't created any pastes yet.</p>
-                <a href="{{ route('dashboard') }}" class="inline-block bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded font-medium uppercase">
+                <a href="{{ route('pastes.create') }}" class="inline-block bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded font-medium uppercase">
                     + Create Your First Paste
                 </a>
             </div>

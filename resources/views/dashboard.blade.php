@@ -3,26 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - CopyPasteHouse</title>
+    <title>Create Paste - CopyPasteHouse</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-900 text-white">
     <!-- Header -->
     <div class="bg-gray-800 py-4 px-4 mb-8">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <h1 class="text-2xl font-bold">CopyPasteHouse</h1>
+            <a href="{{ route('pastes.create') }}" class="text-2xl font-bold text-white hover:text-gray-300">CopyPasteHouse</a>
             <div class="flex items-center gap-4 text-sm">
-                <a href="{{ route('dashboard') }}" class="border border-green-500 text-green-500 px-4 py-2 hover:bg-green-500 hover:text-white transition uppercase">
+                <a href="{{ route('pastes.create') }}" class="border border-green-500 text-green-500 px-4 py-2 hover:bg-green-500 hover:text-white transition uppercase">
                     + New Paste
                 </a>
-                <a href="{{ route('pastes.index') }}" class="border border-gray-400 px-4 py-2 hover:bg-gray-700 transition uppercase">
-                    My Pastes
-                </a>
-                <span class="text-gray-300">{{ auth()->user()->username }}</span>
-                <form method="POST" action="{{ route('logout') }}" class="inline">
-                    @csrf
-                    <button type="submit" class="text-gray-300 hover:text-white">Logout</button>
-                </form>
+                @auth
+                    <a href="{{ route('pastes.index') }}" class="border border-gray-400 px-4 py-2 hover:bg-gray-700 transition uppercase">
+                        My Pastes
+                    </a>
+                    <span class="text-gray-300">{{ auth()->user()->username }}</span>
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="text-gray-300 hover:text-white">Logout</button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="text-gray-300 hover:text-white">Login</a>
+                    <a href="{{ route('register') }}" class="text-gray-300 hover:text-white">Sign up</a>
+                @endauth
             </div>
         </div>
     </div>
