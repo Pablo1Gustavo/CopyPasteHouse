@@ -32,7 +32,9 @@ class PasteController extends Controller
     public function store(StorePasteRequest $request)
     {
         $data = $request->validated();
-        $data['user_id'] = Auth::id();
+        if (Auth::check()) {
+            $data['user_id'] = Auth::id();
+        }
         
         if (array_key_exists('expiration', $data)) {
             if ($data['expiration'] !== null && $data['expiration'] !== '') {
