@@ -186,6 +186,19 @@ class PasteService
 
     public function delete(Paste $paste): void
     {
-        $paste->delete();
+        // Manually cascade deletes because SQLite ignores on delete cascade when altering tables post-hoc.
+        DB::transaction(function () use ($paste)
+        {
+            $paste->accessLogs()->delete();
+            $paste->likes()->delete();
+
+            $paste->comments()->each(function ($comment)
+            {
+                $comment->likes()->delete();
+                $comment->forceDelete();
+            });
+
+            $paste->delete();
+        });
     }
 }
