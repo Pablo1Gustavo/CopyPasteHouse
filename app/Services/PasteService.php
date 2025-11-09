@@ -33,7 +33,7 @@ class PasteService
                 $q->where('syntax_highlight_id', $filters['syntax_highlight_id'])
             )
             ->when(isset($filters['title']), fn (Builder $q) =>
-                $q->whereLike('title', '%' . $filters['title'] . '%')
+                $q->where('title', 'like', '%' . $filters['title'] . '%')
             )
             ->when(isset($filters['created_after']), fn (Builder $q) =>
                 $q->where('created_at', '>=', $filters['created_after'])
@@ -46,11 +46,13 @@ class PasteService
         {
             $tags = $filters['tags'];
             $tags = array_filter($tags, fn ($item) => !empty($item));
-            $tags = array_map(Str::slug(...), $tags);
+            $tags = array_map(static fn ($item) => Str::slug($item), $tags);
             $tags = array_unique($tags);
 
-            $pattern = '%,' . implode(',%,', $tags) . ',%';
-            $query->where('tags', 'LIKE', $pattern);
+            foreach ($tags as $tag)
+            {
+                $query->where('tags', 'LIKE', '%,' . $tag . ',%');
+            }
         }
 
         return $query->get();
@@ -65,35 +67,54 @@ class PasteService
     ): Paste {
         $paste->makeVisible('password');
 
-        $senhaValida = isset($paste->password) && Hash::check($password, $paste->password);
-        if (!$senhaValida)
+        if ($paste->password)
         {
-            throw new WrongPastePassword;
+            $senhaValida = $password !== null && Hash::check($password, $paste->password);
+            if (!$senhaValida)
+            {
+                throw new WrongPastePassword;
+            }
         }
 
-        DB::transaction(function () use ($user, $paste, $ipAddress, $userAgent)
+        $paste->loadMissing([
+            'syntaxHighlight',
+            'user',
+        ])->loadCount([
+            'likes',
+            'accessLogs AS access_count',
+        ]);
+
+        $destroyedPaste = null;
+
+        DB::transaction(function () use (&$destroyedPaste, $user, $paste, $ipAddress, $userAgent)
         {
             $paste->accessLogs()->create([
-                'user_id'    => $user?->id,
-                'ip_address' => $ipAddress,
-                'user_agent' => $userAgent,
+                'user_id'     => $user?->id,
+                'ip'          => $ipAddress,
+                'user_agent'  => $userAgent,
+                'access_date' => now(),
             ]);
+
             if ($paste->destroy_on_open)
             {
+                $destroyedPaste = $paste->replicate();
+                $destroyedPaste->setRelations($paste->getRelations());
+                $destroyedPaste->setAttribute('destroyed', true);
                 $paste->delete();
             }
         });
 
-        $paste
-            ->makeHidden('password')
-            ->load([
-                'syntaxHighlight',
-                'user',
-            ])
-            ->loadCount([
-                'likes',
-                'accessLogs AS access_count',
-            ]);
+        $paste->makeHidden('password');
+
+        if ($destroyedPaste)
+        {
+            $destroyedPaste->makeHidden('password');
+            $destroyedPaste->setAttribute('access_count', ($paste->access_count ?? 0) + 1);
+            $destroyedPaste->setAttribute('likes_count', $paste->likes_count ?? $paste->likes()->count());
+            return $destroyedPaste;
+        }
+
+        $paste->setAttribute('access_count', ($paste->access_count ?? 0) + 1);
 
         return $paste;
     }

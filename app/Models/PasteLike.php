@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PasteLike extends Model
 {
-    use HasFactory, HasUuids, HasFactory;
+    use HasFactory, HasUuids;
 
     const CREATED_AT = 'liked_at';
     const UPDATED_AT = null;

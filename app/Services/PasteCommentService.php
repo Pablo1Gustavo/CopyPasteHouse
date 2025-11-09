@@ -13,7 +13,7 @@ class PasteCommentService
      */
     public function list(Paste $paste): Collection
     {
-        return $paste->commnets();
+        return $paste->comments()->get();
     }
 
     /**
