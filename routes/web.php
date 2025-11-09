@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Controllers\Web\AuthController;
+use App\Http\Controllers\Web\PasteController;
 use Illuminate\Support\Facades\Route;
 
-// Redirect root to login
+// Redirect root to dashboard/login
 Route::get('/', function () {
-    return redirect('/login');
+    return auth()->check() ? redirect('/dashboard') : redirect('/login');
 });
 
 // Guest routes (not logged in)
@@ -16,11 +17,19 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 });
 
+// Public paste viewing (no auth required)
+Route::get('/pastes/{id}', [PasteController::class, 'show'])->name('pastes.show');
+
 // Authenticated routes
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-    
+    Route::get('/dashboard', [PasteController::class, 'create'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    
+    // Paste management
+    Route::get('/pastes', [PasteController::class, 'index'])->name('pastes.index');
+    Route::post('/pastes', [PasteController::class, 'store'])->name('pastes.store');
+    Route::get('/pastes/{paste}/edit', [PasteController::class, 'edit'])->name('pastes.edit');
+    Route::put('/pastes/{paste}', [PasteController::class, 'update'])->name('pastes.update');
+    Route::delete('/pastes/{paste}', [PasteController::class, 'destroy'])->name('pastes.destroy');
+    Route::post('/pastes/{paste}/like', [PasteController::class, 'toggleLike'])->name('pastes.like');
 });
