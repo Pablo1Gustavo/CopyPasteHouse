@@ -13,7 +13,7 @@ return new class extends Migration
         {
             $table->uuid('id')->primary();
             $table->foreignUuid('paste_id')->constrained('pastes');
-            $table->foreignUuid('user_id')->constrained('users');
+            $table->foreignUuid('user_id')->nullable()->constrained('users');
 
             $table->string('ip', 45);
             $table->string('user_agent');

@@ -11,8 +11,8 @@ class SyntaxHighlightFactory extends Factory
         $language = substr(fake()->unique()->name(), 25);
 
         return [
-            'label' => $language,
-            'value' => str($language)->slug()->toString(),
+            'name' => $language,
+            'extension' => str($language)->substr(0,5)->slug()->replace('-', '')->toString(),
         ];
     }
 }
