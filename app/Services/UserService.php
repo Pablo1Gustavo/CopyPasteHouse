@@ -21,10 +21,12 @@ class UserService
         return User::create($data);
     }
 
-    public function show(string $id): ?User
+    public function findByLogin(string $login): ?User
     {
-        return User::with(['settings', 'pastes', 'comments'])
-                   ->find($id);
+        return User::query()
+            ->where('email', $login)
+            ->orWhere('username', $login)
+            ->first();
     }
 
     /**
