@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Exceptions\WrongPastePassword;
 use App\Models\{Paste, User};
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -62,7 +63,7 @@ class PasteService
         $senhaValida = isset($paste->password) && Hash::check($password, $paste->password);
         if (!$senhaValida)
         {
-            throw new \Exception('Invalid password for paste access.');
+            throw new WrongPastePassword;
         }
 
         DB::transaction(function () use ($user, $paste, $ipAddress, $userAgent)
@@ -78,7 +79,17 @@ class PasteService
             }
         });
 
-        $paste->makeHidden('password');
+        $paste
+            ->makeHidden('password')
+            ->load([
+                'syntaxHighlight',
+                'user',
+            ])
+            ->loadCount([
+                'likes',
+                'accessLogs AS access_count',
+            ]);
+
         return $paste;
     }
 
