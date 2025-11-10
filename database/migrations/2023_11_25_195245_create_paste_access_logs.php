@@ -12,7 +12,7 @@ return new class extends Migration
         Schema::create('paste_access_logs', function (Blueprint $table)
         {
             $table->uuid('id')->primary();
-            $table->foreignUuid('paste_id')->constrained('pastes');
+            $table->foreignUuid('paste_id')->constrained('pastes')->onDelete('cascade');
             $table->foreignUuid('user_id')->nullable()->constrained('users');
 
             $table->string('ip', 45);

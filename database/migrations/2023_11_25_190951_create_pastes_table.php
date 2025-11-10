@@ -12,7 +12,7 @@ return new class extends Migration
         Schema::create('pastes', function (Blueprint $table)
         {
             $table->uuid('id')->primary();
-            $table->foreignUuid('user_id')->constrained('users');
+            $table->foreignUuid('user_id')->nullable()->constrained('users');
             $table->foreignUuid('syntax_highlight_id')->nullable()->constrained('syntax_highlights');
             
             $table->string('title', 50);
@@ -23,6 +23,8 @@ return new class extends Migration
             $table->timestamp('expiration')->nullable()->index();
             $table->boolean('destroy_on_open')->default(false);
             $table->timestamp('created_at');
+
+            $table->softDeletes();
         });
     }
 
