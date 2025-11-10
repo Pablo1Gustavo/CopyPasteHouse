@@ -1,23 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - CopyPasteHouse</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-gray-900 text-white">
-    <div class="bg-gray-800 py-4 px-4 mb-8">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <a href="{{ route('pastes.create') }}" class="text-2xl font-bold text-white hover:text-gray-300">CopyPasteHouse</a>
-            <div class="flex items-center gap-4 text-sm">
-                <a href="{{ route('login') }}" class="text-gray-300 hover:text-white">Login</a>
-                <a href="{{ route('register') }}" class="text-gray-300 hover:text-white">Sign up</a>
-            </div>
-        </div>
-    </div>
+@extends('layouts.app')
 
-    <div class="max-w-md mx-auto px-4">
+@section('title', 'Login - CopyPasteHouse')
+
+@section('content')
+<div class="max-w-md mx-auto px-4">
         <div class="bg-gray-800 rounded-lg p-6">
             <h2 class="text-xl font-bold mb-6">Login</h2>
             
@@ -84,5 +70,4 @@
             </p>
         </div>
     </div>
-</body>
-</html>
+@endsection

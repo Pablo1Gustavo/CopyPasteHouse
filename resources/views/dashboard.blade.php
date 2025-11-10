@@ -1,44 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Paste - CopyPasteHouse</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-gray-900 text-white">
-    <!-- Header -->
-    <div class="bg-gray-800 py-4 px-4 mb-8">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <a href="{{ route('pastes.create') }}" class="text-2xl font-bold text-white hover:text-gray-300">CopyPasteHouse</a>
-            <div class="flex items-center gap-4 text-sm">
-                <a href="{{ route('pastes.archive') }}" class="border border-blue-500 text-blue-500 px-4 py-2 hover:bg-blue-500 hover:text-white transition uppercase">
-                    📚 Public Pastes
-                </a>
-                <a href="{{ route('pastes.create') }}" class="border border-green-500 text-green-500 px-4 py-2 hover:bg-green-500 hover:text-white transition uppercase">
-                    + New Paste
-                </a>
-                @auth
-                    <a href="{{ route('pastes.index') }}" class="border border-gray-400 px-4 py-2 hover:bg-gray-700 transition uppercase">
-                        My Pastes
-                    </a>
-                    <a href="{{ route('profile.edit') }}" class="text-gray-300 hover:text-white">
-                        {{ auth()->user()->username }}
-                    </a>
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
-                        @csrf
-                        <button type="submit" class="text-gray-300 hover:text-white">Logout</button>
-                    </form>
-                @else
-                    <a href="{{ route('login') }}" class="text-gray-300 hover:text-white">Login</a>
-                    <a href="{{ route('register') }}" class="text-gray-300 hover:text-white">Sign up</a>
-                @endauth
-            </div>
-        </div>
-    </div>
+@extends('layouts.app')
 
-    <!-- Main Content -->
-    <div class="max-w-4xl mx-auto px-4 py-6">
+@section('title', 'Create Paste - CopyPasteHouse')
+
+@section('content')
+<div class="max-w-4xl mx-auto px-4 py-6">
         @if(session('success'))
             <div class="bg-green-900 border border-green-700 text-green-200 px-4 py-3 mb-4 rounded">
                 {{ session('success') }}
@@ -200,6 +165,7 @@
         </div>
     </div>
 
+    @push('scripts')
     <script>
         function generatePassword() {
             const password = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
@@ -207,5 +173,5 @@
             document.getElementById('password').value = password;
         }
     </script>
-</body>
-</html>
+    @endpush
+@endsection

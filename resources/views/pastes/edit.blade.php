@@ -1,34 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Paste - CopyPasteHouse</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-gray-900 text-white">
-    <!-- Header -->
-    <div class="bg-gray-800 py-4 px-4 mb-8">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <a href="{{ route('pastes.create') }}" class="text-xl font-bold text-white hover:text-gray-300">CopyPasteHouse</a>
-            <div class="flex items-center gap-4 text-sm">
-                <a href="{{ route('pastes.create') }}" class="border border-green-500 text-green-500 px-4 py-2 hover:bg-green-500 hover:text-white transition">
-                    + NEW PASTE
-                </a>
-                <a href="{{ route('pastes.index') }}" class="border border-gray-400 px-4 py-2 hover:bg-gray-700 transition">
-                    MY PASTES
-                </a>
-                <a href="{{ route('profile.edit') }}" class="text-gray-300 hover:text-white">
-                    {{ auth()->user()->username }}
-                </a>
-                <form method="POST" action="{{ route('logout') }}" class="inline">
-                    @csrf
-                    <button type="submit" class="text-gray-300 hover:text-white">Logout</button>
-                </form>
-            </div>
-        </div>
-    </div>
+@extends('layouts.app')
 
+@section('title', 'Edit Paste - CopyPasteHouse')
+
+@section('content')
     <!-- Main Content -->
     <div class="max-w-4xl mx-auto px-4 py-6">
         <div class="bg-gray-800 rounded-lg p-6">
@@ -191,6 +165,7 @@
         </div>
     </div>
 
+    @push('scripts')
     <script>
         function generatePassword() {
             const password = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
@@ -198,5 +173,5 @@
             document.getElementById('password').value = password;
         }
     </script>
-</body>
-</html>
+    @endpush
+@endsection
