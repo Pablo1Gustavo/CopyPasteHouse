@@ -16,6 +16,9 @@
                 <a href="{{ route('pastes.create') }}" class="text-white hover:text-gray-300">CopyPasteHouse</a>
             </h1>
             <div class="flex items-center gap-4 text-sm">
+                <a href="{{ route('pastes.archive') }}" class="border border-blue-500 text-blue-500 px-4 py-2 hover:bg-blue-500 hover:text-white transition uppercase">
+                    📚 Public Pastes
+                </a>
                 <a href="{{ route('pastes.create') }}" class="border border-green-500 text-green-500 px-4 py-2 hover:bg-green-500 hover:text-white transition uppercase">
                     + New Paste
                 </a>

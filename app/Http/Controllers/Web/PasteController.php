@@ -218,6 +218,21 @@ class PasteController extends Controller
         return response()->json($result);
     }
 
+    public function archive(Request $request)
+    {
+        $pastes = Paste::with(['syntaxHighlight', 'user'])
+            ->where('listable', true)
+            ->whereNull('password')
+            ->where(function ($query) {
+                $query->whereNull('expiration')
+                      ->orWhere('expiration', '>', now());
+            })
+            ->latest()
+            ->paginate(20);
+
+        return view('pastes.archive', compact('pastes'));
+    }
+
     public function raw(string $id)
     {
         $paste = Paste::find($id);
