@@ -8,11 +8,9 @@ class SyntaxHighlightFactory extends Factory
 {
     public function definition(): array
     {
-        $language = substr(fake()->unique()->name(), 25);
-
         return [
-            'name' => $language,
-            'extension' => str($language)->substr(0,5)->slug()->replace('-', '')->toString(),
+            'name'      => fake()->unique()->word() . '-' . fake()->randomNumber(4),
+            'extension' => fake()->unique()->fileExtension(),
         ];
     }
 }

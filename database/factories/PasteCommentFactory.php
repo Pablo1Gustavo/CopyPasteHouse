@@ -17,7 +17,7 @@ class PasteCommentFactory extends Factory
             'paste_id'            => Paste::factory(),
             'user_id'             => User::factory(),
             'content'             => $content,
-            'syntax_highlight_id' => SyntaxHighlight::factory(),
+            'syntax_highlight_id' => fake()->boolean(70) ? SyntaxHighlight::factory() : null,
         ];
     }
 }

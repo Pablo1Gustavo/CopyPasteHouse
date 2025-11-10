@@ -19,13 +19,13 @@ class PasteCommentController extends Controller
     ) {
     }
 
-    #[Get('{paste}/comments')]
+    #[Get('{paste}/comments', 'pastes.comments.list')]
     public function list(Paste $paste)
     {
         return $this->service->list($paste);
     }
 
-    #[Post('{paste}/comments')]
+    #[Post('{paste}/comments', 'pastes.comments.create')]
     public function create(Paste $paste, CommentOnPasteRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -37,7 +37,7 @@ class PasteCommentController extends Controller
         ], Response::HTTP_CREATED);
     }
 
-    #[Put('comments/{comment}')]
+    #[Put('comments/{comment}', 'pastes.comments.edit')]
     public function edit(PasteComment $comment, CommentOnPasteRequest $request): JsonResponse
     {
         $this->service->validateAuthenticatedUserOwnership($comment);
@@ -50,7 +50,7 @@ class PasteCommentController extends Controller
         ], Response::HTTP_OK);
     }
 
-    #[Delete('comments/{comment}')]
+    #[Delete('comments/{comment}', 'pastes.comments.delete')]
     public function delete(PasteComment $comment): JsonResponse
     {
         $this->service->validateAuthenticatedUserOwnership($comment);
@@ -62,7 +62,7 @@ class PasteCommentController extends Controller
         ], Response::HTTP_OK);
     }
 
-    #[Patch('comments/{comment}/like')]
+    #[Patch('comments/{comment}/like', 'pastes.comments.like')]
     public function toggleLike(PasteComment $comment): JsonResponse
     {
         $liked = $this->service->toggleLike($comment, Auth::user());
