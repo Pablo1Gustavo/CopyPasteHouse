@@ -26,7 +26,9 @@
                     <a href="{{ route('pastes.index') }}" class="border border-gray-400 px-4 py-2 hover:bg-gray-700 transition uppercase">
                         My Pastes
                     </a>
-                    <span class="text-gray-300">{{ auth()->user()->username }}</span>
+                    <a href="{{ route('profile.edit') }}" class="text-gray-300 hover:text-white">
+                        {{ auth()->user()->username }}
+                    </a>
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf
                         <button type="submit" class="text-gray-300 hover:text-white">Logout</button>
