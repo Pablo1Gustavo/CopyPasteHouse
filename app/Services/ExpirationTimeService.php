@@ -17,6 +17,14 @@ class ExpirationTimeService
     }
 
     /**
+     * Get a single expiration time by ID
+     */
+    public function show(string $id): ?ExpirationTime
+    {
+        return ExpirationTime::find($id);
+    }
+
+    /**
      * @param array{minutes: int, label: string} $data
      */
     public function create(array $data): ExpirationTime
@@ -34,8 +42,15 @@ class ExpirationTimeService
         return $expirationTime;
     }
 
-    public function delete(ExpirationTime $expirationTime): void
+    public function delete(string $id): bool
     {
+        $expirationTime = ExpirationTime::find($id);
+        
+        if (!$expirationTime) {
+            return false;
+        }
+        
         $expirationTime->delete();
+        return true;
     }
 }

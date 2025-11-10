@@ -16,6 +16,14 @@ class SyntaxHighlightService
     }
 
     /**
+     * Get a single syntax highlight by ID
+     */
+    public function show(string $id): ?SyntaxHighlight
+    {
+        return SyntaxHighlight::find($id);
+    }
+
+    /**
      * @param array{extension: string, name: string} $data
      */
     public function create(array $data): SyntaxHighlight
@@ -33,8 +41,15 @@ class SyntaxHighlightService
         return $syntaxHighlight;
     }
 
-    public function delete(SyntaxHighlight $syntaxHighlight): void
+    public function delete(string $id): bool
     {
+        $syntaxHighlight = SyntaxHighlight::find($id);
+        
+        if (!$syntaxHighlight) {
+            return false;
+        }
+        
         $syntaxHighlight->delete();
+        return true;
     }
 }
