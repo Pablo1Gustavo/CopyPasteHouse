@@ -34,3 +34,4 @@ Route::middleware('auth')->group(function () {
 
 // Public paste viewing (no auth required)
 Route::get('/pastes/{id}', [PasteController::class, 'show'])->name('pastes.show');
+Route::get('/pastes/{id}/raw', [PasteController::class, 'raw'])->name('pastes.raw');
