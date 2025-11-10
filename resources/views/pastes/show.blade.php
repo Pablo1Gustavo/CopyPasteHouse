@@ -51,6 +51,24 @@
                 </div>
             @endif
 
+            @if(!isset($paste->destroyed) && isset($paste->destroy_on_open) && $paste->destroy_on_open && request()->query('created') === '1')
+                @auth
+                    @if(auth()->id() === $paste->user_id)
+                        <div class="bg-blue-900 border border-blue-700 text-blue-200 px-4 py-3 mb-4 rounded">
+                            🔒 <strong>Burn After Reading Enabled:</strong> As the creator, you can view this paste multiple times. However, when <strong>anyone else</strong> views it, they will see a confirmation page and the paste will be permanently deleted after they confirm.
+                        </div>
+                    @else
+                        <div class="bg-orange-900 border border-orange-700 text-orange-200 px-4 py-3 mb-4 rounded">
+                            🔥 <strong>Burn After Reading Enabled:</strong> This paste will show a confirmation page and be permanently deleted when viewed. Share the link carefully!
+                        </div>
+                    @endif
+                @else
+                    <div class="bg-orange-900 border border-orange-700 text-orange-200 px-4 py-3 mb-4 rounded">
+                        🔥 <strong>Burn After Reading Enabled:</strong> This paste will show a confirmation page and be permanently deleted when viewed. Share the link carefully!
+                    </div>
+                @endauth
+            @endif
+
             <h2 class="text-xl font-bold mb-4">{{ $paste->title }}</h2>
 
             <div class="flex flex-wrap gap-2 mb-4">
@@ -115,6 +133,16 @@
                     >
                         📋 Copy
                     </button>
+                    
+                    @if(!isset($paste->destroyed))
+                        <a 
+                            href="{{ route('pastes.raw', $paste->id) }}"
+                            class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 text-sm rounded inline-flex items-center"
+                            target="_blank"
+                        >
+                            📄 Raw
+                        </a>
+                    @endif
                     
                     @auth
                         @if(!isset($paste->destroyed) && $paste->user_id === auth()->id())
