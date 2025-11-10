@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Services\UserService;
+use App\Services\UserSettingsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -11,11 +12,24 @@ use Illuminate\Validation\Rule;
 class ProfileController extends Controller
 {
     public function __construct(
-        private UserService $userService
+        private UserService $userService,
+        private UserSettingsService $userSettingsService
     ) {}
 
     public function edit()
     {
+        // Ensure settings are loaded, create default if not exists
+        $user = Auth::user()->load('settings');
+        
+        if (!$user->settings) {
+            $this->userSettingsService->createOrUpdate($user->id, [
+                'timezone' => 'UTC',
+                'language' => 'en',
+                'theme' => 'system',
+            ]);
+            $user->load('settings');
+        }
+        
         return view('profile.edit');
     }
 
@@ -51,5 +65,19 @@ class ProfileController extends Controller
 
         return redirect()->route('profile.edit')
             ->with('success', 'Password changed successfully!');
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'timezone' => 'required|string|max:40',
+            'language' => 'required|string|max:10',
+            'theme' => 'required|in:light,dark,system',
+        ]);
+
+        $this->userSettingsService->createOrUpdate(Auth::id(), $validated);
+
+        return redirect()->route('profile.edit')
+            ->with('success', 'Settings updated successfully!');
     }
 }

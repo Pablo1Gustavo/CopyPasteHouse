@@ -11,6 +11,12 @@
 @endpush
 
 @section('content')
+@php
+    $isLight = auth()->check() && auth()->user()->settings && auth()->user()->settings->theme === 'light';
+    $cardClass = $isLight ? 'bg-white border border-gray-300' : 'bg-gray-800';
+    $textClass = $isLight ? 'text-gray-900' : 'text-white';
+    $mutedClass = $isLight ? 'text-gray-600' : 'text-gray-400';
+@endphp
 <div class="max-w-6xl mx-auto px-4 py-6">
         @if(session('success'))
             <div class="bg-green-900 border border-green-700 text-green-200 px-4 py-3 mb-4 rounded">
@@ -18,7 +24,7 @@
             </div>
         @endif
 
-        <div class="bg-gray-800 rounded-lg p-6">
+        <div class="{{ $cardClass }} rounded-lg p-6">
             @if(isset($paste->destroyed) && $paste->destroyed)
                 <div class="bg-yellow-900 border border-yellow-700 text-yellow-200 px-4 py-3 mb-4 rounded">
                     ⚠️ This paste was set to "destroy on open" and has been permanently deleted after this view.
@@ -43,10 +49,10 @@
                 @endauth
             @endif
 
-            <h2 class="text-xl font-bold mb-4">{{ $paste->title }}</h2>
+            <h2 class="text-xl font-bold mb-4 {{ $textClass }}">{{ $paste->title }}</h2>
 
             <div class="mb-3">
-                <span class="text-gray-400 text-sm">
+                <span class="{{ $mutedClass }} text-sm">
                     By <span class="text-blue-400 font-semibold">{{ $paste->user ? $paste->user->username : 'Anonymous' }}</span>
                     <span class="mx-2">•</span>
                     {{ $paste->created_at->diffForHumans() }}
@@ -55,19 +61,19 @@
 
             <div class="flex flex-wrap gap-2 mb-4">
                 @if($paste->syntaxHighlight)
-                    <span class="border border-gray-600 px-3 py-1 text-xs rounded">
+                    <span class="{{ $isLight ? 'border-gray-300 text-gray-700' : 'border-gray-600 text-white' }} border px-3 py-1 text-xs rounded">
                         📄 {{ $paste->syntaxHighlight->label }}
                     </span>
                 @endif
-                <span class="border border-gray-600 px-3 py-1 text-xs rounded">
+                <span class="{{ $isLight ? 'border-gray-300 text-gray-700' : 'border-gray-600 text-white' }} border px-3 py-1 text-xs rounded">
                     📅 {{ $paste->created_at->format('M d, Y H:i') }}
                 </span>
                 @if($paste->expiration)
-                    <span class="border border-gray-600 px-3 py-1 text-xs rounded">
+                    <span class="{{ $isLight ? 'border-gray-300 text-gray-700' : 'border-gray-600 text-white' }} border px-3 py-1 text-xs rounded">
                         ⏰ {{ $paste->expiration->format('M d, Y H:i') }}
                     </span>
                 @else
-                    <span class="border border-gray-600 px-3 py-1 text-xs rounded">
+                    <span class="{{ $isLight ? 'border-gray-300 text-gray-700' : 'border-gray-600 text-white' }} border px-3 py-1 text-xs rounded">
                         ⏰ Never
                     </span>
                 @endif
@@ -75,7 +81,7 @@
 
             @if($paste->tags && is_array($paste->tags) && count($paste->tags) > 0)
                 <div class="mb-4 flex flex-wrap gap-2">
-                    <span class="text-gray-400 text-sm">Tags:</span>
+                    <span class="{{ $mutedClass }} text-sm">Tags:</span>
                     @foreach($paste->tags as $index => $tag)
                         @php
                             $colors = ['red', 'green', 'blue', 'orange', 'purple'];
@@ -89,7 +95,7 @@
                             ];
                             $bgColor = $bgColors[$colors[$colorIndex]];
                         @endphp
-                        <span class="inline-flex items-center gap-1 bg-gray-700 text-white text-xs px-2 py-1 rounded">
+                        <span class="inline-flex items-center gap-1 {{ $isLight ? 'bg-gray-200 text-gray-900' : 'bg-gray-700 text-white' }} text-xs px-2 py-1 rounded">
                             <span class="{{ $bgColor }} w-5 h-5 rounded-full flex items-center justify-center text-white text-xs uppercase">
                                 {{ substr($tag, 0, 1) }}
                             </span>
@@ -99,8 +105,8 @@
                 </div>
             @endif
 
-            <div class="bg-gray-900 rounded-lg overflow-auto min-h-[200px]">
-                <pre class="p-4"><code class="language-{{ $paste->syntaxHighlight->value ?? 'plaintext' }}">{{ $paste->content }}</code></pre>
+            <div class="{{ $isLight ? 'bg-gray-50 border border-gray-300' : 'bg-gray-900' }} rounded-lg overflow-auto min-h-[200px]">
+                <pre class="p-4"><code class="language-{{ $paste->syntaxHighlight->value ?? 'plaintext' }} {{ $textClass }}">{{ $paste->content }}</code></pre>
             </div>
 
             <div class="mt-4 flex items-center justify-between">
@@ -164,12 +170,12 @@
         </div>
 
         <!-- Comments Section -->
-        <div class="bg-gray-800 shadow-md rounded-lg p-6 mt-6">
-            <h2 class="text-xl font-bold mb-4">Comments ({{ $comments->count() }})</h2>
+        <div class="{{ $cardClass }} shadow-md rounded-lg p-6 mt-6">
+            <h2 class="text-xl font-bold mb-4 {{ $textClass }}">Comments ({{ $comments->count() }})</h2>
 
             <!-- Comments List -->
             @forelse($comments as $comment)
-                <div class="border-b border-gray-700 pb-4 mb-4 last:border-0">
+                <div class="{{ $isLight ? 'border-b border-gray-300' : 'border-b border-gray-700' }} pb-4 mb-4 last:border-0">
                     <div class="flex justify-between items-start mb-2">
                         <div>
                             <span class="font-semibold text-blue-400">{{ $comment->user->username }}</span>
@@ -196,24 +202,29 @@
                     @if($comment->syntax_highlight_id)
                         <pre><code class="language-{{ $comment->syntaxHighlight->code ?? 'plaintext' }} rounded">{{ $comment->content }}</code></pre>
                     @else
-                        <p class="text-gray-300">{{ $comment->content }}</p>
+                        <p class="{{ $textClass }}">{{ $comment->content }}</p>
                     @endif
                 </div>
             @empty
-                <p class="text-gray-500 text-center py-4">No comments yet. Be the first to comment!</p>
+                <p class="{{ $mutedClass }} text-center py-4">No comments yet. Be the first to comment!</p>
             @endforelse
+
+            <!-- Pagination -->
+            <div class="mt-4">
+                {{ $comments->links() }}
+            </div>
 
             <!-- Comment Form -->
             @auth
                 <div class="mt-6">
-                    <h3 class="text-lg font-semibold mb-3">Add a Comment</h3>
+                    <h3 class="text-lg font-semibold mb-3 {{ $textClass }}">Add a Comment</h3>
                     <form action="{{ route('pastes.comments.store', $paste->id) }}" method="POST">
                         @csrf
                         <div class="mb-4">
                             <textarea 
                                 name="content" 
                                 rows="4" 
-                                class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+                                class="w-full {{ $isLight ? 'bg-gray-100 border-gray-300 text-gray-900' : 'bg-gray-700 border-gray-600 text-white' }} border rounded px-3 py-2"
                                 placeholder="Write your comment..."
                                 required
                             >{{ old('content') }}</textarea>
@@ -223,10 +234,10 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">Syntax Highlight (optional)</label>
+                            <label class="block text-sm font-medium mb-2 {{ $textClass }}">Syntax Highlight (optional)</label>
                             <select 
                                 name="syntax_highlight_id" 
-                                class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2"
+                                class="w-full {{ $isLight ? 'bg-gray-100 border-gray-300 text-gray-900' : 'bg-gray-700 border-gray-600 text-white' }} border rounded px-3 py-2"
                             >
                                 <option value="">None</option>
                                 @foreach($syntaxHighlights as $highlight)

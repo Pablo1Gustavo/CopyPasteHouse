@@ -8,6 +8,8 @@ use App\Http\Requests\StorePasteCommentRequest;
 use App\Http\Requests\UpdatePasteRequest;
 use App\Models\Paste;
 use App\Models\PasteComment;
+use App\Models\PasteLike;
+use App\Models\PasteAccessLog;
 use App\Services\ExpirationTimeService;
 use App\Services\PasteCommentService;
 use App\Services\PasteService;
@@ -77,12 +79,12 @@ class PasteController extends Controller
             abort(404, 'Paste has expired');
         }
         
-        // Load comments with relationships
+        // Load comments with relationships and pagination
         $comments = $paste->comments()
             ->with(['user', 'syntaxHighlight'])
             ->withCount('likes')
             ->latest()
-            ->get();
+            ->paginate(20);
         
         // Check if current user has liked the paste and comments
         $userHasLiked = false;
@@ -175,7 +177,13 @@ class PasteController extends Controller
 
         $syntaxHighlights = $this->syntaxHighlightService->list();
 
-        return view('pastes.show', compact('paste', 'comments', 'userHasLiked', 'likedCommentIds', 'syntaxHighlights'));
+        return view('pastes.show', compact(
+            'paste', 
+            'comments', 
+            'userHasLiked', 
+            'likedCommentIds', 
+            'syntaxHighlights'
+        ));
     }
 
 
