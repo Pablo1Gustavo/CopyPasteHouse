@@ -5,12 +5,12 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Http\Response;
 
-class WrongPastePassword extends Exception
+class NotOwner extends Exception
 {
     public function render()
     {
         return response()->json([
-            'message' => 'The provided password is incorrect.'
-        ], Response::HTTP_UNAUTHORIZED);
+            'message' => 'The user is not the owner of this resource.'
+        ], Response::HTTP_FORBIDDEN);
     }
 }

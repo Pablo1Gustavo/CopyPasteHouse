@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests;
 
-use App\Models\SyntaxHighlight;
+use App\Models\{SyntaxHighlight};
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdatePasteRequest extends FormRequest
+class CreatePasteRequest extends FormRequest
 {
     /**
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -18,13 +18,14 @@ class UpdatePasteRequest extends FormRequest
 
         return [
             'syntax_highlight_id' => ['nullable', $syntaxHighlightExists],
-            'title'               => ['nullable', 'string', 'max:50'],
+            'title'               => ['required', 'string', 'max:50'],
             'tags'                => ['nullable', 'array'],
-            'tags.*'              => ['nullable', 'max:50'],
-            'content'             => ['nullable', 'string', 'max:512000'],
-            'listable'            => ['nullable', 'boolean'],
-            'password'            => ['nullable', 'string', 'min:8', 'max:255'],
-            'expiration'          => ['nullable', 'string'],
+            'tags.*'              => ['string', 'max:50'],
+            'content'             => ['required', 'string', 'max:30000'],
+            'listable'            => ['boolean'],
+            'password'            => ['nullable', 'string', 'min:3', 'max:70'],
+            'expiration'          => ['nullable', 'date_format:Y-m-d H:i'],
+            'destroy_on_open'     => ['boolean'],
         ];
     }
 

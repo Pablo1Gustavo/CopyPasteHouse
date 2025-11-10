@@ -1,26 +1,28 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Models\SyntaxHighlight;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpdateSyntaxHighlightRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
+    /**
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
     public function rules(): array
     {
+        $syntaxHighlightId = $this->route('syntaxHighlight')?->id;
+
+        $uniqueSyntaxHighlightName = Rule::unique(SyntaxHighlight::class, 'name')
+            ->ignore($syntaxHighlightId);
+        $uniqueSyntaxHighlightExtension = Rule::unique(SyntaxHighlight::class, 'extension')
+            ->ignore($syntaxHighlightId);
+
         return [
-            'name' => [
-                'sometimes',
-                'string',
-                'max:50',
-                Rule::unique('syntax_highlights', 'name')->ignore($this->route('syntax_highlight'))
-            ],
+            'name'      => ['nullable', 'string', 'max:35', $uniqueSyntaxHighlightName],
+            'extension' => ['nullable', 'string', 'max:25', $uniqueSyntaxHighlightExtension],
         ];
     }
 }

@@ -3,12 +3,11 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Exceptions\WrongPastePassword;
+use App\Exceptions\{NotOwner, WrongPastePassword};
 use App\Models\{Paste, User};
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\{DB, Hash};
-use Illuminate\Support\Str;
+use Illuminate\Support\{Collection, Str};
+use Illuminate\Support\Facades\{Auth, DB, Hash};
 
 class PasteService
 {
@@ -66,14 +65,10 @@ class PasteService
         string $userAgent
     ): Paste {
         $paste->makeVisible('password');
-
-        if ($paste->password)
+      
+        if (isset($paste->password) && !Hash::check($password, $paste->password))
         {
-            $senhaValida = $password !== null && Hash::check($password, $paste->password);
-            if (!$senhaValida)
-            {
-                throw new WrongPastePassword;
-            }
+            throw new WrongPastePassword;
         }
 
         $paste->loadMissing([
@@ -89,32 +84,27 @@ class PasteService
         DB::transaction(function () use (&$destroyedPaste, $user, $paste, $ipAddress, $userAgent)
         {
             $paste->accessLogs()->create([
-                'user_id'     => $user?->id,
-                'ip'          => $ipAddress,
-                'user_agent'  => $userAgent,
-                'access_date' => now(),
+                'user_id'    => $user?->id,
+                'ip'         => $ipAddress,
+                'user_agent' => $userAgent,
             ]);
-
             if ($paste->destroy_on_open)
             {
-                $destroyedPaste = $paste->replicate();
-                $destroyedPaste->setRelations($paste->getRelations());
-                $destroyedPaste->setAttribute('destroyed', true);
                 $paste->delete();
             }
         });
 
         $paste->makeHidden('password');
-
-        if ($destroyedPaste)
-        {
-            $destroyedPaste->makeHidden('password');
-            $destroyedPaste->setAttribute('access_count', ($paste->access_count ?? 0) + 1);
-            $destroyedPaste->setAttribute('likes_count', $paste->likes_count ?? $paste->likes()->count());
-            return $destroyedPaste;
-        }
-
-        $paste->setAttribute('access_count', ($paste->access_count ?? 0) + 1);
+        $paste
+            ->makeHidden('password')
+            ->load([
+                'syntaxHighlight',
+                'user',
+            ])
+            ->loadCount([
+                'likes',
+                'accessLogs AS access_count',
+            ]);
 
         return $paste;
     }
@@ -144,6 +134,14 @@ class PasteService
         return Paste::create($data);
     }
 
+    public function validateAuthenticatedUserOwnership(Paste $comment)
+    {
+        if (Auth::id() != $comment->user_id)
+        {
+            throw new NotOwner;
+        }
+    }
+
     /**
      * @param array{
      *     syntax_highlight_id?: string,
@@ -158,6 +156,8 @@ class PasteService
      */
     public function edit(Paste $paste, array $data): Paste
     {
+        $this->validateAuthenticatedUserOwnership($paste);
+
         $data = array_filter($data, fn ($value) => $value !== null);
         $paste->update($data);
         return $paste;
@@ -189,19 +189,7 @@ class PasteService
 
     public function delete(Paste $paste): void
     {
-        // Manually cascade deletes because SQLite ignores on delete cascade when altering tables post-hoc.
-        DB::transaction(function () use ($paste)
-        {
-            $paste->accessLogs()->delete();
-            $paste->likes()->delete();
-
-            $paste->comments()->each(function ($comment)
-            {
-                $comment->likes()->delete();
-                $comment->forceDelete();
-            });
-
-            $paste->delete();
-        });
+        $this->validateAuthenticatedUserOwnership($paste);
+        $paste->delete();
     }
 }

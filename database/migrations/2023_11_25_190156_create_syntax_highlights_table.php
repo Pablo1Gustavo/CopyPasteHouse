@@ -10,8 +10,8 @@ return new class extends Migration
         Schema::create('syntax_highlights', function (Blueprint $table)
         {
             $table->uuid('id')->primary();
-            $table->string('label', 35)->unique();
-            $table->string('value', 25)->unique();
+            $table->string('name', 35)->unique();
+            $table->string('extension', 25)->unique();
 
             $table->softDeletes();
         });

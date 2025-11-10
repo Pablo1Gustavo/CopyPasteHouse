@@ -3,8 +3,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\{CommentLike, Paste, PasteComment, User};
+use App\Exceptions\NotOwner;
+use App\Models\{Paste, PasteComment, User};
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class PasteCommentService
 {
@@ -13,7 +15,10 @@ class PasteCommentService
      */
     public function list(Paste $paste): Collection
     {
-        return $paste->comments()->get();
+        return $paste->comments()
+            ->with(['user', 'syntaxHighlight'])
+            ->withCount('likes')
+            ->get();
     }
 
     /**
@@ -28,15 +33,22 @@ class PasteCommentService
         return $paste->comments()->create($data);
     }
 
+    public function validateAuthenticatedUserOwnership(PasteComment $comment)
+    {
+        if (Auth::id() != $comment->user_id)
+        {
+            throw new NotOwner;
+        }
+    }
+
     /**
      * @param array{
-     *     content?: string,
-     *     syntax_highlight_id?: string
+     *     content: string,
+     *     syntax_highlight_id: string
      * } $data
      */
     public function edit(PasteComment $comment, array $data): PasteComment
     {
-        $data = array_filter($data, fn ($value) => $value !== null);
         $comment->update($data);
         return $comment;
     }
