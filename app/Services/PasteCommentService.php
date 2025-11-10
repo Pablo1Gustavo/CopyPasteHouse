@@ -51,7 +51,7 @@ class PasteCommentService
         return $comment->likes()->where('user_id', $user->id)->exists();
     }
 
-    public function toggleLike(PasteComment $pasteComment, User $user): bool
+    public function toggleLike(PasteComment $pasteComment, User $user): array
     {
         $existingLike = $this->isLikedByUser($pasteComment, $user);
 
@@ -64,6 +64,9 @@ class PasteCommentService
             $pasteComment->likes()->create(['user_id' => $user->id]);
         }
 
-        return !$existingLike;
+        return [
+            'liked' => !$existingLike,
+            'count' => $pasteComment->likes()->count()
+        ];
     }
 }

@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePasteRequest;
+use App\Http\Requests\StorePasteCommentRequest;
 use App\Http\Requests\UpdatePasteRequest;
 use App\Models\ExpirationTime;
 use App\Models\Paste;
+use App\Models\PasteComment;
 use App\Models\SyntaxHighlight;
+use App\Services\PasteCommentService;
 use App\Services\PasteService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +19,8 @@ use Illuminate\Support\Facades\Hash;
 class PasteController extends Controller
 {
     public function __construct(
-        private PasteService $pasteService
+        private PasteService $pasteService,
+        private PasteCommentService $pasteCommentService
     ) {}
 
 
@@ -71,6 +75,23 @@ class PasteController extends Controller
             abort(404, 'Paste has expired');
         }
         
+        // Load comments with relationships
+        $comments = $paste->comments()
+            ->with(['user', 'syntaxHighlight'])
+            ->withCount('likes')
+            ->latest()
+            ->get();
+        
+        // Check if current user has liked the paste and comments
+        $userHasLiked = false;
+        $likedCommentIds = [];
+        if (Auth::check()) {
+            $userHasLiked = $this->pasteService->isLikedByUser($paste, Auth::user());
+            $likedCommentIds = $comments->filter(function($comment) {
+                return $this->pasteCommentService->isLikedByUser($comment, Auth::user());
+            })->pluck('id')->toArray();
+        }
+        
         // Make password visible to check if it exists
         $paste->makeVisible('password');
 
@@ -90,14 +111,27 @@ class PasteController extends Controller
             }
         }
 
-        $paste->accessLogs()->create([
-            'user_id'     => Auth::id(),
-            'ip'          => $request->ip(),
-            'user_agent'  => $request->userAgent(),
-            'access_date' => now(),
-        ]);
+        // Check if this session has already viewed this paste
+        $sessionKey = 'viewed_paste_' . $paste->id;
+        $hasViewedInSession = session()->has($sessionKey);
 
-        $accessCount = ($paste->access_count ?? 0) + 1;
+        // Only increment view count if this is a new view for this session
+        if (!$hasViewedInSession) {
+            $paste->accessLogs()->create([
+                'user_id'     => Auth::id(),
+                'ip'          => $request->ip(),
+                'user_agent'  => $request->userAgent(),
+                'access_date' => now(),
+            ]);
+
+            // Mark this paste as viewed in the current session
+            session()->put($sessionKey, true);
+        }
+
+        $accessCount = $paste->access_count ?? 0;
+        if (!$hasViewedInSession) {
+            $accessCount++;
+        }
 
         // Check if this is the initial view after creation (skip destroy on open warning)
         $isInitialView = $request->query('created') === '1';
@@ -137,7 +171,9 @@ class PasteController extends Controller
         $paste->setAttribute('access_count', $accessCount);
         $paste->makeHidden('password');
 
-        return view('pastes.show', compact('paste'));
+        $syntaxHighlights = SyntaxHighlight::all();
+
+        return view('pastes.show', compact('paste', 'comments', 'userHasLiked', 'likedCommentIds', 'syntaxHighlights'));
     }
 
 
@@ -221,6 +257,7 @@ class PasteController extends Controller
     public function archive(Request $request)
     {
         $pastes = Paste::with(['syntaxHighlight', 'user'])
+            ->withCount(['likes', 'comments', 'accessLogs as access_count'])
             ->where('listable', true)
             ->whereNull('password')
             ->where(function ($query) {
@@ -248,5 +285,21 @@ class PasteController extends Controller
         
         return response($paste->content)
             ->header('Content-Type', 'text/plain; charset=UTF-8');
+    }
+
+    public function storeComment(StorePasteCommentRequest $request, Paste $paste)
+    {
+        $data = $request->validated();
+        $this->pasteCommentService->create($paste, Auth::user(), $data);
+        
+        return redirect()->route('pastes.show', $paste->id)
+            ->with('success', 'Comment posted successfully!');
+    }
+
+    public function toggleCommentLike(PasteComment $comment)
+    {
+        $result = $this->pasteCommentService->toggleLike($comment, Auth::user());
+        
+        return response()->json($result);
     }
 }

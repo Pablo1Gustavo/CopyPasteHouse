@@ -168,7 +168,7 @@ class PasteService
         return $paste->likes()->where('user_id', $user->id)->exists();
     }
 
-    public function toggleLike(Paste $paste, User $user): bool
+    public function toggleLike(Paste $paste, User $user): array
     {
         $existingLike = $this->isLikedByUser($paste, $user);
 
@@ -181,7 +181,10 @@ class PasteService
             $paste->likes()->create(['user_id' => $user->id]);
         }
 
-        return !$existingLike;
+        return [
+            'liked' => !$existingLike,
+            'count' => $paste->likes()->count()
+        ];
     }
 
     public function delete(Paste $paste): void

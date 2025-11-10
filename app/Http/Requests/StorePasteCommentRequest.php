@@ -14,7 +14,6 @@ class StorePasteCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'paste_id' => 'required|exists:pastes,id',
             'content' => 'required|string|max:10000',
             'syntax_highlight_id' => 'nullable|exists:syntax_highlights,id',
         ];

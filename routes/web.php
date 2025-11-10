@@ -31,6 +31,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/pastes/{paste}', [PasteController::class, 'destroy'])->name('pastes.destroy');
     Route::post('/pastes/{paste}/like', [PasteController::class, 'toggleLike'])->name('pastes.like');
     
+    // Comments
+    Route::post('/pastes/{paste}/comments', [PasteController::class, 'storeComment'])->name('pastes.comments.store');
+    Route::post('/comments/{comment}/like', [PasteController::class, 'toggleCommentLike'])->name('comments.like');
+    
     //Profile
     Route::get('/profile', function () {return view('profile.edit');})->name('profile.edit');
     // TODO: O back-end para esta rota precisa ser criado.
