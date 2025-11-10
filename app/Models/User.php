@@ -16,6 +16,7 @@ class User extends Authenticatable
         'username',
         'email',
         'password',
+        'is_admin',
     ];
 
     protected $hidden = [
@@ -28,6 +29,7 @@ class User extends Authenticatable
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
         'password' => 'hashed',
+        'is_admin' => 'boolean',
     ];
 
     public function pastes(): HasMany
