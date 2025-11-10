@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\PasteController;
+use App\Http\Controllers\Web\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 // Public landing page allows anyone to create a paste
@@ -35,12 +36,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/pastes/{paste}/comments', [PasteController::class, 'storeComment'])->name('pastes.comments.store');
     Route::post('/comments/{comment}/like', [PasteController::class, 'toggleCommentLike'])->name('comments.like');
     
-    //Profile
-    Route::get('/profile', function () {return view('profile.edit');})->name('profile.edit');
-    // TODO: O back-end para esta rota precisa ser criado.
-    Route::put('/profile', function () {return redirect()->route('profile.edit');})->name('profile.update');
-    // TODO: O back-end para esta rota precisa ser criado.
-    Route::put('/password', function () {return redirect()->route('profile.edit');})->name('password.update');
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
 });
 
 // Public paste viewing (no auth required)
