@@ -3,12 +3,11 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Exceptions\WrongPastePassword;
+use App\Exceptions\{NotOwner, WrongPastePassword};
 use App\Models\{Paste, User};
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\{DB, Hash};
-use Illuminate\Support\Str;
+use Illuminate\Support\{Collection, Str};
+use Illuminate\Support\Facades\{Auth, DB, Hash};
 
 class PasteService
 {
@@ -65,8 +64,7 @@ class PasteService
     ): Paste {
         $paste->makeVisible('password');
 
-        $senhaValida = isset($paste->password) && Hash::check($password, $paste->password);
-        if (!$senhaValida)
+        if (isset($paste->password) && !Hash::check($password, $paste->password))
         {
             throw new WrongPastePassword;
         }
@@ -75,7 +73,7 @@ class PasteService
         {
             $paste->accessLogs()->create([
                 'user_id'    => $user?->id,
-                'ip_address' => $ipAddress,
+                'ip'         => $ipAddress,
                 'user_agent' => $userAgent,
             ]);
             if ($paste->destroy_on_open)
@@ -123,6 +121,14 @@ class PasteService
         return Paste::create($data);
     }
 
+    public function validateAuthenticatedUserOwnership(Paste $comment)
+    {
+        if (Auth::id() != $comment->user_id)
+        {
+            throw new NotOwner;
+        }
+    }
+
     /**
      * @param array{
      *     syntax_highlight_id?: string,
@@ -137,6 +143,8 @@ class PasteService
      */
     public function edit(Paste $paste, array $data): Paste
     {
+        $this->validateAuthenticatedUserOwnership($paste);
+
         $data = array_filter($data, fn ($value) => $value !== null);
         $paste->update($data);
         return $paste;
@@ -165,6 +173,7 @@ class PasteService
 
     public function delete(Paste $paste): void
     {
+        $this->validateAuthenticatedUserOwnership($paste);
         $paste->delete();
     }
 }
