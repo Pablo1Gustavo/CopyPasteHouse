@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignUuid('paste_id')->constrained('pastes');
             $table->foreignUuid('user_id')->constrained('users');
             $table->mediumText('content');
-            $table->foreignUuid('syntax_highlight_id')->constrained('syntax_highlights');
+            $table->foreignUuid('syntax_highlight_id')->nullable()->constrained('syntax_highlights');
 
             $table->timestamps();
             $table->softDeletes();
