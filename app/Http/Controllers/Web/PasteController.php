@@ -51,7 +51,7 @@ class PasteController extends Controller
         
         $paste = $this->pasteService->create($data, Auth::user());
         
-        return redirect()->route('pastes.show', $paste->id)
+        return redirect()->route('pastes.show', ['id' => $paste->id, 'created' => '1'])
             ->with('success', 'Paste created successfully!');
     }
 
@@ -99,7 +99,21 @@ class PasteController extends Controller
 
         $accessCount = ($paste->access_count ?? 0) + 1;
 
-        if ($paste->destroy_on_open) {
+        // Check if this is the initial view after creation (skip destroy on open warning)
+        $isInitialView = $request->query('created') === '1';
+        
+        // Check if the current viewer is the creator of the paste
+        $isCreator = Auth::check() && Auth::id() === $paste->user_id;
+
+        // If paste has destroy_on_open AND viewer is not the creator, handle burn logic
+        if ($paste->destroy_on_open && !$isCreator && !$isInitialView && !$request->has('confirm_burn')) {
+            $paste->setAttribute('access_count', $accessCount);
+            $paste->makeHidden('password');
+            return view('pastes.burn-warning', compact('paste'));
+        }
+
+        // If confirmed and not the creator, proceed with viewing/destruction
+        if ($paste->destroy_on_open && !$isCreator && !$isInitialView && $request->has('confirm_burn')) {
             $displayPaste = (object) [
                 'id' => null,
                 'title' => $paste->title,
@@ -114,7 +128,8 @@ class PasteController extends Controller
                 'destroyed' => true
             ];
 
-            $paste->delete();
+            // Use the service method to properly handle cascading deletes
+            $this->pasteService->delete($paste);
 
             return view('pastes.show', ['paste' => $displayPaste]);
         }
@@ -201,5 +216,22 @@ class PasteController extends Controller
         $result = $this->pasteService->toggleLike($paste, Auth::user());
         
         return response()->json($result);
+    }
+
+    public function raw(string $id)
+    {
+        $paste = Paste::find($id);
+        
+        if (!$paste) {
+            abort(404, 'Paste not found');
+        }
+        
+        // Check if paste is expired
+        if ($paste->expiration && $paste->expiration->isPast()) {
+            abort(404, 'Paste has expired');
+        }
+        
+        return response($paste->content)
+            ->header('Content-Type', 'text/plain; charset=UTF-8');
     }
 }
