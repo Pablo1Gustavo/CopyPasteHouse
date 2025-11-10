@@ -20,11 +20,10 @@
                     MY PASTES
                 </a>
 
-                <a href="{{ route('profile.edit') }}" class="border border-blue-400 text-blue-400 px-4 py-2 hover:bg-blue-400 hover:text-white transition">
-                    MY PROFILE
+                <a href="{{ route('profile.edit') }}" class="text-gray-300 hover:text-white">
+                    {{ auth()->user()->username }}
                 </a>
 
-                <span class="text-gray-300">{{ auth()->user()->username }}</span>
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
                     <button type="submit" class="text-gray-300 hover:text-white">Logout</button>
@@ -53,7 +52,8 @@
 
             <form method="POST" action="{{ route('profile.update') }}" class="space-y-4">
                 @csrf
-                @method('PUT') <div>
+                @method('PUT') 
+                <div>
                     <label for="username" class="block text-sm font-medium mb-2">Username:</label>
                     <input 
                         type="text" 
