@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePasteRequest;
 use App\Http\Requests\StorePasteCommentRequest;
 use App\Http\Requests\UpdatePasteRequest;
-use App\Models\ExpirationTime;
 use App\Models\Paste;
 use App\Models\PasteComment;
-use App\Models\SyntaxHighlight;
+use App\Services\ExpirationTimeService;
 use App\Services\PasteCommentService;
 use App\Services\PasteService;
+use App\Services\SyntaxHighlightService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -20,14 +20,16 @@ class PasteController extends Controller
 {
     public function __construct(
         private PasteService $pasteService,
-        private PasteCommentService $pasteCommentService
+        private PasteCommentService $pasteCommentService,
+        private SyntaxHighlightService $syntaxHighlightService,
+        private ExpirationTimeService $expirationTimeService
     ) {}
 
 
     public function create()
     {
-        $syntaxHighlights = SyntaxHighlight::all();
-        $expirationTimes = ExpirationTime::all();
+        $syntaxHighlights = $this->syntaxHighlightService->list();
+        $expirationTimes = $this->expirationTimeService->list();
         
         return view('dashboard', compact('syntaxHighlights', 'expirationTimes'));
     }
@@ -171,7 +173,7 @@ class PasteController extends Controller
         $paste->setAttribute('access_count', $accessCount);
         $paste->makeHidden('password');
 
-        $syntaxHighlights = SyntaxHighlight::all();
+        $syntaxHighlights = $this->syntaxHighlightService->list();
 
         return view('pastes.show', compact('paste', 'comments', 'userHasLiked', 'likedCommentIds', 'syntaxHighlights'));
     }
@@ -195,8 +197,8 @@ class PasteController extends Controller
             abort(403, 'Unauthorized');
         }
         
-        $syntaxHighlights = SyntaxHighlight::all();
-        $expirationTimes = ExpirationTime::all();
+        $syntaxHighlights = $this->syntaxHighlightService->list();
+        $expirationTimes = $this->expirationTimeService->list();
         
         return view('pastes.edit', compact('paste', 'syntaxHighlights', 'expirationTimes'));
     }
