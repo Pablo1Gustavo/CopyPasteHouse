@@ -33,7 +33,15 @@ class PasteController extends Controller
         $syntaxHighlights = $this->syntaxHighlightService->list();
         $expirationTimes = $this->expirationTimeService->list();
         
-        return view('dashboard', compact('syntaxHighlights', 'expirationTimes'));
+        // Get public tags and user's own tags
+        $tags = \App\Models\Tag::where(function($query) {
+            $query->where('is_public', true);
+            if (Auth::check()) {
+                $query->orWhere('user_id', Auth::id());
+            }
+        })->orderBy('name')->get();
+        
+        return view('dashboard', compact('syntaxHighlights', 'expirationTimes', 'tags'));
     }
 
 
@@ -52,12 +60,17 @@ class PasteController extends Controller
             }
         }
 
-        if (isset($data['tags']) && is_string($data['tags'])) {
-            $tags = array_map('trim', explode(',', $data['tags']));
-            $data['tags'] = array_values(array_filter($tags, fn ($tag) => $tag !== ''));
-        }
+        // Extract tag_ids before creating paste
+        $tagIds = $data['tag_ids'] ?? [];
+        unset($data['tag_ids']);
+        unset($data['tags']); // Remove old tags field if exists
         
         $paste = $this->pasteService->create($data, Auth::user());
+        
+        // Attach all tags to paste (remove duplicates)
+        if (!empty($tagIds)) {
+            $paste->tags()->attach(array_unique($tagIds));
+        }
         
         return redirect()->route('pastes.show', ['id' => $paste->id, 'created' => '1'])
             ->with('success', 'Paste created successfully!');
@@ -66,7 +79,7 @@ class PasteController extends Controller
 
     public function show(string $id, Request $request)
     {
-        $paste = Paste::with(['syntaxHighlight', 'user'])
+        $paste = Paste::with(['syntaxHighlight', 'user', 'tags'])
             ->withCount(['likes', 'accessLogs as access_count'])
             ->find($id);
         
@@ -208,7 +221,13 @@ class PasteController extends Controller
         $syntaxHighlights = $this->syntaxHighlightService->list();
         $expirationTimes = $this->expirationTimeService->list();
         
-        return view('pastes.edit', compact('paste', 'syntaxHighlights', 'expirationTimes'));
+        // Get public tags and user's own tags
+        $tags = \App\Models\Tag::where(function($query) {
+            $query->where('is_public', true)
+                  ->orWhere('user_id', Auth::id());
+        })->orderBy('name')->get();
+        
+        return view('pastes.edit', compact('paste', 'syntaxHighlights', 'expirationTimes', 'tags'));
     }
 
 
@@ -228,16 +247,21 @@ class PasteController extends Controller
             }
         }
         
-        if (isset($data['tags']) && is_string($data['tags'])) {
-            $tags = array_map('trim', explode(',', $data['tags']));
-            $data['tags'] = array_values(array_filter($tags, fn ($tag) => $tag !== ''));
-        }
+        // Extract tag_ids before updating paste
+        $tagIds = $data['tag_ids'] ?? [];
+        unset($data['tag_ids']);
+        
+        // Remove old 'tags' field if it exists
+        unset($data['tags']);
         
         if (isset($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         }
         
         $paste = $this->pasteService->edit($paste, $data);
+        
+        // Sync tags (replaces all existing tags)
+        $paste->tags()->sync(array_unique($tagIds));
         
         return redirect()->route('pastes.show', $paste->id)
             ->with('success', 'Paste updated successfully!');
@@ -266,18 +290,45 @@ class PasteController extends Controller
 
     public function archive(Request $request)
     {
-        $pastes = Paste::with(['syntaxHighlight', 'user'])
+        $query = Paste::with(['syntaxHighlight', 'user', 'tags'])
             ->withCount(['likes', 'comments', 'accessLogs as access_count'])
             ->where('listable', true)
             ->whereNull('password')
-            ->where(function ($query) {
-                $query->whereNull('expiration')
-                      ->orWhere('expiration', '>', now());
-            })
-            ->latest()
-            ->paginate(20);
+            ->where(function ($q) {
+                $q->whereNull('expiration')
+                  ->orWhere('expiration', '>', now());
+            });
 
-        return view('pastes.archive', compact('pastes'));
+        // Search filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        // Tag filter
+        if ($request->filled('tag')) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->where('slug', $request->tag);
+            });
+        }
+
+        // Syntax highlight filter
+        if ($request->filled('syntax')) {
+            $query->where('syntax_highlight_id', $request->syntax);
+        }
+
+        $pastes = $query->latest()->paginate(20)->withQueryString();
+
+        // Get public tags for filter dropdown
+        $tags = \App\Models\Tag::where('is_public', true)
+            ->orderBy('name')
+            ->get();
+        $syntaxHighlights = $this->syntaxHighlightService->list();
+
+        return view('pastes.archive', compact('pastes', 'tags', 'syntaxHighlights'));
     }
 
     public function raw(string $id)

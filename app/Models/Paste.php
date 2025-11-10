@@ -5,7 +5,7 @@ use App\Casts\CommaSeparatedStringListCast;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
-use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasMany};
 
 class Paste extends Model
 {
@@ -17,7 +17,6 @@ class Paste extends Model
         'syntax_highlight_id',
         'user_id',
         'title',
-        'tags',
         'content',
         'listable',
         'password',
@@ -28,7 +27,6 @@ class Paste extends Model
         'password'
     ];
     protected $casts = [
-        'tags'            => CommaSeparatedStringListCast::class,
         'created_at'      => 'datetime',
         'expiration'      => 'datetime',
         'listable'        => 'boolean',
@@ -58,5 +56,11 @@ class Paste extends Model
     public function comments(): HasMany
     {
         return $this->hasMany(PasteComment::class);
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'paste_tag')
+            ->withTimestamps();
     }
 }

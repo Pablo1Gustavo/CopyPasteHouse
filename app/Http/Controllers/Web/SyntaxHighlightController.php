@@ -35,8 +35,8 @@ class SyntaxHighlightController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'label' => 'required|string|max:50|unique:syntax_highlights,label',
-            'value' => 'required|string|max:50|unique:syntax_highlights,value',
+            'name' => 'required|string|max:50|unique:syntax_highlights,name',
+            'extension' => 'required|string|max:50|unique:syntax_highlights,extension',
         ]);
 
         $this->syntaxHighlightService->create($validated);
@@ -73,8 +73,8 @@ class SyntaxHighlightController extends Controller
         }
 
         $validated = $request->validate([
-            'label' => 'required|string|max:50|unique:syntax_highlights,label,' . $syntax_highlight,
-            'value' => 'required|string|max:50|unique:syntax_highlights,value,' . $syntax_highlight,
+            'name' => 'required|string|max:50|unique:syntax_highlights,name,' . $syntax_highlight,
+            'extension' => 'required|string|max:50|unique:syntax_highlights,extension,' . $syntax_highlight,
         ]);
 
         $this->syntaxHighlightService->edit($highlight, $validated);

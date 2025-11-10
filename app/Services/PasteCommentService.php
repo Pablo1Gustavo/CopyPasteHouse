@@ -53,6 +53,21 @@ class PasteCommentService
         return $comment;
     }
 
+    /**
+     * Update a comment by ID
+     */
+    public function update(string $id, array $data): ?PasteComment
+    {
+        $comment = PasteComment::find($id);
+        
+        if (!$comment) {
+            return null;
+        }
+
+        $comment->update($data);
+        return $comment;
+    }
+
     public function delete(PasteComment $comment): void
     {
         $comment->delete();

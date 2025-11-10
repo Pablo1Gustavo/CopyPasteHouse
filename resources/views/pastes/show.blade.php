@@ -79,34 +79,22 @@
                 @endif
             </div>
 
-            @if($paste->tags && is_array($paste->tags) && count($paste->tags) > 0)
+            @if($paste->tags && $paste->tags->count() > 0)
                 <div class="mb-4 flex flex-wrap gap-2">
                     <span class="{{ $mutedClass }} text-sm">Tags:</span>
-                    @foreach($paste->tags as $index => $tag)
-                        @php
-                            $colors = ['red', 'green', 'blue', 'orange', 'purple'];
-                            $colorIndex = $index % count($colors);
-                            $bgColors = [
-                                'red' => 'bg-red-600',
-                                'green' => 'bg-green-600',
-                                'blue' => 'bg-blue-600',
-                                'orange' => 'bg-orange-600',
-                                'purple' => 'bg-purple-600'
-                            ];
-                            $bgColor = $bgColors[$colors[$colorIndex]];
-                        @endphp
-                        <span class="inline-flex items-center gap-1 {{ $isLight ? 'bg-gray-200 text-gray-900' : 'bg-gray-700 text-white' }} text-xs px-2 py-1 rounded">
-                            <span class="{{ $bgColor }} w-5 h-5 rounded-full flex items-center justify-center text-white text-xs uppercase">
-                                {{ substr($tag, 0, 1) }}
-                            </span>
-                            {{ $tag }}
-                        </span>
+                    @foreach($paste->tags as $tag)
+                        <a href="{{ route('tags.public.show', $tag->slug) }}" 
+                           class="inline-flex items-center gap-1 text-white text-xs px-3 py-1 rounded-full hover:opacity-80 transition" 
+                           style="background-color: {{ $tag->color }}"
+                           title="{{ $tag->description ?: $tag->name }}">
+                            {{ $tag->name }}
+                        </a>
                     @endforeach
                 </div>
             @endif
 
             <div class="{{ $isLight ? 'bg-gray-50 border border-gray-300' : 'bg-gray-900' }} rounded-lg overflow-auto min-h-[200px]">
-                <pre class="p-4"><code class="language-{{ $paste->syntaxHighlight->value ?? 'plaintext' }} {{ $textClass }}">{{ $paste->content }}</code></pre>
+                <pre class="p-4"><code class="language-{{ $paste->syntaxHighlight->extension ?? 'plaintext' }} {{ $textClass }}">{{ $paste->content }}</code></pre>
             </div>
 
             <div class="mt-4 flex items-center justify-between">
@@ -181,8 +169,13 @@
                             <span class="font-semibold text-blue-400">{{ $comment->user->username }}</span>
                             <span class="text-gray-500 text-sm ml-2">{{ $comment->created_at->diffForHumans() }}</span>
                         </div>
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center space-x-3">
                             @auth
+                                @if(auth()->id() === $comment->user_id || auth()->user()->is_admin)
+                                    <a href="{{ route('comments.edit', $comment->id) }}" class="text-yellow-400 hover:text-yellow-300 text-sm">
+                                        ✏️ Edit
+                                    </a>
+                                @endif
                                 <button 
                                     onclick="toggleCommentLike('{{ $comment->id }}')"
                                     id="commentLikeButton-{{ $comment->id }}"
@@ -200,7 +193,7 @@
                     </div>
 
                     @if($comment->syntax_highlight_id)
-                        <pre><code class="language-{{ $comment->syntaxHighlight->code ?? 'plaintext' }} rounded">{{ $comment->content }}</code></pre>
+                        <pre><code class="language-{{ $comment->syntaxHighlight->extension ?? 'plaintext' }} rounded">{{ $comment->content }}</code></pre>
                     @else
                         <p class="{{ $textClass }}">{{ $comment->content }}</p>
                     @endif

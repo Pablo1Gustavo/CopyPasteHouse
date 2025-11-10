@@ -16,7 +16,9 @@ class StorePasteRequest extends FormRequest
         return [
             'syntax_highlight_id' => 'required|exists:syntax_highlights,id',
             'title' => 'required|string|max:50',
-            'tags' => 'nullable|string|max:255',
+            'tags' => 'nullable|string|max:255', // Keep for backward compatibility
+            'tag_ids' => 'nullable|array',
+            'tag_ids.*' => 'exists:tags,id',
             'content' => 'required|string|max:512000', // 500KB max
             'listable' => 'boolean',
             'password' => 'nullable|string|min:8|max:255',

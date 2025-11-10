@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignUuid('syntax_highlight_id')->nullable()->constrained('syntax_highlights');
             
             $table->string('title', 50);
-            $table->string('tags')->nullable();
             $table->mediumText('content');
             $table->boolean('listable')->default(true);
             $table->string('password', 60)->nullable();

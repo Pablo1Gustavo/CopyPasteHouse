@@ -25,12 +25,12 @@
             @method('PUT')
 
             <div>
-                <label for="label" class="block text-sm font-medium mb-2">Label:</label>
+                <label for="name" class="block text-sm font-medium mb-2">Name:</label>
                 <input 
                     type="text" 
-                    id="label" 
-                    name="label"
-                    value="{{ old('label', $highlight->label) }}"
+                    id="name" 
+                    name="name"
+                    value="{{ old('name', $highlight->name) }}"
                     required
                     maxlength="50"
                     class="w-full bg-gray-900 border border-gray-600 text-white px-4 py-2 text-sm focus:outline-none focus:border-gray-400 rounded"
@@ -39,12 +39,12 @@
             </div>
 
             <div>
-                <label for="value" class="block text-sm font-medium mb-2">Value:</label>
+                <label for="extension" class="block text-sm font-medium mb-2">Extension:</label>
                 <input 
                     type="text" 
-                    id="value" 
-                    name="value"
-                    value="{{ old('value', $highlight->value) }}"
+                    id="extension" 
+                    name="extension"
+                    value="{{ old('extension', $highlight->extension) }}"
                     required
                     maxlength="50"
                     class="w-full bg-gray-900 border border-gray-600 text-white px-4 py-2 text-sm focus:outline-none focus:border-gray-400 rounded font-mono"

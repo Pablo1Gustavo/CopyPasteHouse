@@ -66,28 +66,60 @@
                         >
                             @foreach($syntaxHighlights as $highlight)
                                 <option value="{{ $highlight->id }}" {{ old('syntax_highlight_id', $paste->syntax_highlight_id) == $highlight->id ? 'selected' : '' }}>
-                                    {{ $highlight->label }}
+                                    {{ $highlight->name }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
                 </div>
 
-                <div>
-                    <label for="tags" class="block text-sm font-medium mb-2 {{ $textClass }}">Tags:</label>
-                    <input 
-                        type="text" 
-                        id="tags" 
-                        name="tags"
-                        value="{{ old('tags', is_array($paste->tags) ? implode(', ', $paste->tags) : '') }}"
-                        placeholder="tag1, tag2, tag3"
-                        maxlength="255"
-                        class="w-full {{ $inputClass }} px-4 py-2 text-sm focus:outline-none focus:border-gray-400 rounded"
-                    >
-                    <div class="text-xs {{ $mutedClass }} mt-1">Comma separated (max 10 tags)</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-1">
+                    <label for="tag_search" class="block text-sm font-medium mb-2 {{ $textClass }}">Tags:</label>
+                    <div class="relative" x-data="{ myTagsOnly: false }">
+                        <input 
+                            type="text" 
+                            id="tag_search" 
+                            placeholder="Search and select tags..."
+                            class="w-full {{ $inputClass }} px-4 py-2 text-sm focus:outline-none focus:border-gray-400 rounded"
+                            autocomplete="off"
+                        >
+                        <div id="tag_dropdown" class="hidden absolute z-10 w-full mt-1 {{ $isLight ? 'bg-white border border-gray-300' : 'bg-gray-800 border border-gray-600' }} rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                            <div class="px-4 py-2 border-b {{ $isLight ? 'border-gray-300 bg-gray-50' : 'border-gray-600 bg-gray-700' }}">
+                                <label class="flex items-center cursor-pointer text-sm">
+                                    <input 
+                                        type="checkbox" 
+                                        x-model="myTagsOnly"
+                                        class="mr-2 w-3 h-3"
+                                    >
+                                    <span class="{{ $textClass }}">My Tags Only</span>
+                                </label>
+                            </div>
+                            @foreach($tags as $tag)
+                                <div class="tag-option px-4 py-2 cursor-pointer {{ $isLight ? 'hover:bg-gray-100' : 'hover:bg-gray-700' }} flex flex-col gap-1" 
+                                     data-tag-id="{{ $tag->id }}" 
+                                     data-tag-name="{{ $tag->name }}"
+                                     data-tag-color="{{ $tag->color }}"
+                                     data-user-id="{{ $tag->user_id }}"
+                                     x-show="!myTagsOnly || '{{ $tag->user_id }}' == '{{ auth()->id() }}'">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-3 h-3 rounded-full" style="background-color: {{ $tag->color }}"></span>
+                                        <span class="{{ $textClass }}">{{ $tag->name }}</span>
+                                    </div>
+                                    @if($tag->description)
+                                        <div class="{{ $mutedClass }} text-xs ml-5">{{ $tag->description }}</div>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div id="selected_tags" class="mt-2 flex flex-wrap gap-2"></div>
+                    <div class="text-xs {{ $mutedClass }} mt-1">
+                        <a href="{{ route('tags.create') }}" class="text-blue-400 hover:text-blue-300" target="_blank">Create a new tag</a>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="md:col-span-1 grid grid-cols-2 gap-4">
                     <div>
                         <label for="expiration" class="block text-sm font-medium mb-2 {{ $textClass }}">Expiration:</label>
                         <select 
@@ -120,6 +152,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
                 <div>
                     <label for="password" class="block text-sm font-medium mb-2 {{ $textClass }}">Password (optional):</label>
@@ -181,6 +214,96 @@
             document.getElementById('password').type = 'text';
             document.getElementById('password').value = password;
         }
+
+        // Tag search and multi-select functionality
+        const tagSearch = document.getElementById('tag_search');
+        const tagDropdown = document.getElementById('tag_dropdown');
+        const selectedTagsContainer = document.getElementById('selected_tags');
+        const selectedTags = new Map(); // Store selected tags: id -> {name, color}
+
+        // Pre-populate existing tags
+        @foreach($paste->tags as $tag)
+            selectedTags.set('{{ $tag->id }}', { 
+                name: '{{ $tag->name }}', 
+                color: '{{ $tag->color }}' 
+            });
+        @endforeach
+        renderSelectedTags();
+
+        // Show dropdown on focus
+        tagSearch.addEventListener('focus', () => {
+            tagDropdown.classList.remove('hidden');
+        });
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#tag_search') && !e.target.closest('#tag_dropdown')) {
+                tagDropdown.classList.add('hidden');
+            }
+        });
+
+        // Filter tags based on search
+        tagSearch.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const options = document.querySelectorAll('.tag-option');
+            
+            options.forEach(option => {
+                const tagName = option.dataset.tagName.toLowerCase();
+                if (tagName.includes(searchTerm)) {
+                    option.style.display = 'flex';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+        });
+
+        // Handle tag selection
+        document.querySelectorAll('.tag-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const tagId = option.dataset.tagId;
+                const tagName = option.dataset.tagName;
+                const tagColor = option.dataset.tagColor;
+
+                if (!selectedTags.has(tagId)) {
+                    selectedTags.set(tagId, { name: tagName, color: tagColor });
+                    renderSelectedTags();
+                    
+                    // Close dropdown for tactile feedback
+                    tagDropdown.classList.add('hidden');
+                }
+
+                tagSearch.value = '';
+                
+                // Reset filter
+                document.querySelectorAll('.tag-option').forEach(opt => {
+                    opt.style.display = 'flex';
+                });
+            });
+        });
+
+        function renderSelectedTags() {
+            selectedTagsContainer.innerHTML = '';
+            
+            selectedTags.forEach((tag, id) => {
+                const tagBadge = document.createElement('div');
+                tagBadge.className = 'inline-flex items-center gap-2 px-3 py-1 rounded-full text-white text-sm';
+                tagBadge.style.backgroundColor = tag.color;
+                tagBadge.innerHTML = `
+                    <span>${tag.name}</span>
+                    <button type="button" onclick="removeTag('${id}')" class="text-white hover:text-gray-200">×</button>
+                    <input type="hidden" name="tag_ids[]" value="${id}">
+                `;
+                selectedTagsContainer.appendChild(tagBadge);
+            });
+        }
+
+        function removeTag(tagId) {
+            selectedTags.delete(tagId);
+            renderSelectedTags();
+        }
+
+        // Make removeTag available globally
+        window.removeTag = removeTag;
     </script>
     @endpush
 @endsection

@@ -24,12 +24,12 @@
             @csrf
 
             <div>
-                <label for="label" class="block text-sm font-medium mb-2">Label:</label>
+                <label for="name" class="block text-sm font-medium mb-2">Name:</label>
                 <input 
                     type="text" 
-                    id="label" 
-                    name="label"
-                    value="{{ old('label') }}"
+                    id="name" 
+                    name="name"
+                    value="{{ old('name') }}"
                     placeholder="e.g., JavaScript"
                     required
                     maxlength="50"
@@ -39,12 +39,12 @@
             </div>
 
             <div>
-                <label for="value" class="block text-sm font-medium mb-2">Value:</label>
+                <label for="extension" class="block text-sm font-medium mb-2">Extension:</label>
                 <input 
                     type="text" 
-                    id="value" 
-                    name="value"
-                    value="{{ old('value') }}"
+                    id="extension" 
+                    name="extension"
+                    value="{{ old('extension') }}"
                     placeholder="e.g., javascript"
                     required
                     maxlength="50"

@@ -19,31 +19,31 @@ class DatabaseSeeder extends Seeder
     {
         // Seed Syntax Highlights
         $syntaxHighlights = [
-            ['label' => 'None', 'value' => 'none'],
-            ['label' => 'PHP', 'value' => 'php'],
-            ['label' => 'JavaScript', 'value' => 'javascript'],
-            ['label' => 'Python', 'value' => 'python'],
-            ['label' => 'Java', 'value' => 'java'],
-            ['label' => 'C', 'value' => 'c'],
-            ['label' => 'C++', 'value' => 'cpp'],
-            ['label' => 'C#', 'value' => 'csharp'],
-            ['label' => 'Ruby', 'value' => 'ruby'],
-            ['label' => 'Go', 'value' => 'go'],
-            ['label' => 'Rust', 'value' => 'rust'],
-            ['label' => 'HTML', 'value' => 'html'],
-            ['label' => 'CSS', 'value' => 'css'],
-            ['label' => 'SQL', 'value' => 'sql'],
-            ['label' => 'Bash', 'value' => 'bash'],
-            ['label' => 'JSON', 'value' => 'json'],
-            ['label' => 'XML', 'value' => 'xml'],
-            ['label' => 'YAML', 'value' => 'yaml'],
-            ['label' => 'Markdown', 'value' => 'markdown'],
+            ['name' => 'None', 'extension' => 'none'],
+            ['name' => 'PHP', 'extension' => 'php'],
+            ['name' => 'JavaScript', 'extension' => 'javascript'],
+            ['name' => 'Python', 'extension' => 'python'],
+            ['name' => 'Java', 'extension' => 'java'],
+            ['name' => 'C', 'extension' => 'c'],
+            ['name' => 'C++', 'extension' => 'cpp'],
+            ['name' => 'C#', 'extension' => 'csharp'],
+            ['name' => 'Ruby', 'extension' => 'ruby'],
+            ['name' => 'Go', 'extension' => 'go'],
+            ['name' => 'Rust', 'extension' => 'rust'],
+            ['name' => 'HTML', 'extension' => 'html'],
+            ['name' => 'CSS', 'extension' => 'css'],
+            ['name' => 'SQL', 'extension' => 'sql'],
+            ['name' => 'Bash', 'extension' => 'bash'],
+            ['name' => 'JSON', 'extension' => 'json'],
+            ['name' => 'XML', 'extension' => 'xml'],
+            ['name' => 'YAML', 'extension' => 'yaml'],
+            ['name' => 'Markdown', 'extension' => 'markdown'],
         ];
 
         foreach ($syntaxHighlights as $highlight) {
             SyntaxHighlight::firstOrCreate(
-                ['value' => $highlight['value']],
-                ['label' => $highlight['label']]
+                ['extension' => $highlight['extension']],
+                ['name' => $highlight['name']]
             );
         }
 
@@ -66,10 +66,71 @@ class DatabaseSeeder extends Seeder
             );
         }
 
-        // Seed test user (optional)
-        // User::factory()->create([
-        //     'username' => 'testuser',
-        //     'email' => 'test@example.com',
-        // ]);
+        // Seed default admin user
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'username' => 'admin',
+                'password' => bcrypt('password'),
+                'is_admin' => true,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // Seed test regular user
+        $testUser = User::firstOrCreate(
+            ['email' => 'user@example.com'],
+            [
+                'username' => 'testuser',
+                'password' => bcrypt('password'),
+                'is_admin' => false,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // Seed default tags (created by admin, public)
+        $defaultTags = [
+            ['name' => 'Tutorial', 'slug' => 'tutorial', 'description' => 'Educational content and how-to guides', 'color' => '#10B981', 'is_public' => true],
+            ['name' => 'Bug Fix', 'slug' => 'bug-fix', 'description' => 'Code snippets for fixing bugs', 'color' => '#EF4444', 'is_public' => true],
+            ['name' => 'Algorithm', 'slug' => 'algorithm', 'description' => 'Algorithm implementations and data structures', 'color' => '#8B5CF6', 'is_public' => true],
+            ['name' => 'API', 'slug' => 'api', 'description' => 'API examples and integrations', 'color' => '#F59E0B', 'is_public' => true],
+            ['name' => 'Database', 'slug' => 'database', 'description' => 'Database queries and schemas', 'color' => '#3B82F6', 'is_public' => true],
+            ['name' => 'Frontend', 'slug' => 'frontend', 'description' => 'HTML, CSS, and JavaScript snippets', 'color' => '#EC4899', 'is_public' => true],
+            ['name' => 'Backend', 'slug' => 'backend', 'description' => 'Server-side code and logic', 'color' => '#14B8A6', 'is_public' => true],
+            ['name' => 'Security', 'slug' => 'security', 'description' => 'Security-related code and best practices', 'color' => '#DC2626', 'is_public' => true],
+        ];
+
+        foreach ($defaultTags as $tagData) {
+            \App\Models\Tag::firstOrCreate(
+                ['slug' => $tagData['slug']],
+                [
+                    'user_id' => $admin->id,
+                    'name' => $tagData['name'],
+                    'description' => $tagData['description'],
+                    'color' => $tagData['color'],
+                    'is_public' => $tagData['is_public'],
+                ]
+            );
+        }
+
+        // Seed some user-created tags (always private for regular users)
+        $userTags = [
+            ['name' => 'My Notes', 'slug' => 'my-notes', 'description' => 'Personal code notes', 'color' => '#6366F1'],
+            ['name' => 'Quick Reference', 'slug' => 'quick-reference', 'description' => 'Quick reference snippets', 'color' => '#A855F7'],
+            ['name' => 'Work Project', 'slug' => 'work-project', 'description' => 'Code for work projects', 'color' => '#84CC16'],
+        ];
+
+        foreach ($userTags as $tagData) {
+            \App\Models\Tag::firstOrCreate(
+                ['slug' => $tagData['slug']],
+                [
+                    'user_id' => $testUser->id,
+                    'name' => $tagData['name'],
+                    'description' => $tagData['description'],
+                    'color' => $tagData['color'],
+                    'is_public' => false, // User tags are always private
+                ]
+            );
+        }
     }
 }

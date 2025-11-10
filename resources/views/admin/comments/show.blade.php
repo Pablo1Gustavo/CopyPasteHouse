@@ -38,7 +38,7 @@
             @if($comment->syntax_highlight_id)
                 <div>
                     <label class="text-gray-400 text-sm">Syntax Highlighting:</label>
-                    <p class="text-white">{{ $comment->syntaxHighlight->label }}</p>
+                    <p class="text-white">{{ $comment->syntaxHighlight->name }}</p>
                 </div>
             @endif
 
@@ -46,7 +46,7 @@
                 <label class="text-gray-400 text-sm mb-2 block">Content:</label>
                 @if($comment->syntax_highlight_id)
                     <div class="bg-gray-900 rounded-lg p-4">
-                        <pre><code class="language-{{ $comment->syntaxHighlight->value }}">{{ $comment->content }}</code></pre>
+                        <pre><code class="language-{{ $comment->syntaxHighlight->extension }}">{{ $comment->content }}</code></pre>
                     </div>
                 @else
                     <div class="bg-gray-900 rounded-lg p-4 text-gray-300">

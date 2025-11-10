@@ -18,7 +18,7 @@ class PasteController extends Controller
     ) {
     }
 
-    #[Get('', 'pastes.list')]
+    #[Get('', 'api.pastes.list')]
     public function list(ListPastesRequest $request): JsonResponse
     {
         $filters = $request->validated();
@@ -27,7 +27,7 @@ class PasteController extends Controller
         return response()->json($pastes, Response::HTTP_OK);
     }
 
-    #[Get('my-pastes', 'pastes.my-pastes', 'auth:sanctum')]
+    #[Get('my-pastes', 'api.pastes.my-pastes', 'auth:sanctum')]
     public function myPastes(ListPastesRequest $request): JsonResponse
     {
         $filters = $request->validated();
@@ -38,7 +38,7 @@ class PasteController extends Controller
         return response()->json($pastes, Response::HTTP_OK);
     }
 
-    #[Get('{paste}', 'pastes.show')]
+    #[Get('{paste}', 'api.pastes.show')]
     public function show(Paste $paste, AccessPasteRequest $request): JsonResponse
     {
         $password = $request->validated("password") ?? null;
@@ -54,7 +54,7 @@ class PasteController extends Controller
         return response()->json($accessedPaste, Response::HTTP_OK);
     }
 
-    #[Post('', 'pastes.create')]
+    #[Post('', 'api.pastes.create')]
     public function create(CreatePasteRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -67,7 +67,7 @@ class PasteController extends Controller
         ], Response::HTTP_CREATED);
     }
 
-    #[Put('{paste}', 'pastes.edit', 'auth:sanctum')]
+    #[Put('{paste}', 'api.pastes.edit', 'auth:sanctum')]
     public function edit(Paste $paste, UpdatePasteRequest $request): JsonResponse
     {
         $editedPaste = $this->service->edit($paste, $request->validated());
@@ -78,7 +78,7 @@ class PasteController extends Controller
         ], Response::HTTP_OK);
     }
 
-    #[Delete('{paste}', 'pastes.delete', 'auth:sanctum')]
+    #[Delete('{paste}', 'api.pastes.delete', 'auth:sanctum')]
     public function delete(Paste $paste): JsonResponse
     {
         $this->service->delete($paste);
@@ -89,7 +89,7 @@ class PasteController extends Controller
     }
 
     #[Middleware('auth:sanctum')]
-    #[Post('{paste}/like', 'pastes.toggle-like', 'auth:sanctum')]
+    #[Post('{paste}/like', 'api.pastes.toggle-like', 'auth:sanctum')]
     public function toggleLike(Paste $paste): JsonResponse
     {
         $user = Auth::user();

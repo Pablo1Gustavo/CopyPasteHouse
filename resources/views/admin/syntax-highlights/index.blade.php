@@ -34,8 +34,8 @@
         <table class="w-full">
             <thead class="bg-gray-700">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Label</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Value</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Extension</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
@@ -43,10 +43,10 @@
                 @foreach($highlights as $highlight)
                     <tr class="hover:bg-gray-750">
                         <td class="px-6 py-4 whitespace-nowrap text-white">
-                            {{ $highlight->label }}
+                            {{ $highlight->name }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-gray-300 font-mono text-sm">
-                            {{ $highlight->value }}
+                            {{ $highlight->extension }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex gap-2">

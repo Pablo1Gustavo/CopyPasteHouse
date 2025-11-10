@@ -19,8 +19,10 @@ class UpdatePasteRequest extends FormRequest
         return [
             'syntax_highlight_id' => ['nullable', $syntaxHighlightExists],
             'title'               => ['nullable', 'string', 'max:50'],
-            'tags'                => ['nullable', 'array'],
+            'tags'                => ['nullable', 'array'], // Keep for backward compatibility
             'tags.*'              => ['nullable', 'max:50'],
+            'tag_ids'             => ['nullable', 'array'],
+            'tag_ids.*'           => ['exists:tags,id'],
             'content'             => ['nullable', 'string', 'max:512000'],
             'listable'            => ['nullable', 'boolean'],
             'password'            => ['nullable', 'string', 'min:8', 'max:255'],

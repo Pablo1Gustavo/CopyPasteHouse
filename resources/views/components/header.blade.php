@@ -20,6 +20,9 @@
                 <a href="{{ route('pastes.index') }}" class="{{ $isLight ? 'border border-gray-400 text-gray-700 hover:bg-gray-200' : 'border border-gray-400 hover:bg-gray-700' }} px-4 py-2 transition uppercase">
                     {{ __('app.my_pastes') }}
                 </a>
+                <a href="{{ route('tags.my') }}" class="{{ $isLight ? 'border border-gray-400 text-gray-700 hover:bg-gray-200' : 'border border-gray-400 hover:bg-gray-700' }} px-4 py-2 transition uppercase">
+                    🏷️ My Tags
+                </a>
                 @if(auth()->user()->is_admin)
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" class="border border-purple-500 text-purple-500 px-4 py-2 hover:bg-purple-500 hover:text-white transition uppercase">
@@ -31,6 +34,7 @@
                             <a href="{{ route('admin.comments') }}" class="block px-4 py-2 {{ $isLight ? 'text-gray-900 hover:bg-gray-100' : 'text-white hover:bg-gray-700' }}">💬 Comments</a>
                             <a href="{{ route('syntax-highlights.index') }}" class="block px-4 py-2 {{ $isLight ? 'text-gray-900 hover:bg-gray-100' : 'text-white hover:bg-gray-700' }}">📄 Syntax Highlights</a>
                             <a href="{{ route('expiration-times.index') }}" class="block px-4 py-2 {{ $isLight ? 'text-gray-900 hover:bg-gray-100' : 'text-white hover:bg-gray-700' }}">⏰ Expiration Times</a>
+                            <a href="{{ route('tags.index') }}" class="block px-4 py-2 {{ $isLight ? 'text-gray-900 hover:bg-gray-100' : 'text-white hover:bg-gray-700' }}">📌 Tags</a>
                         </div>
                     </div>
                 @endif
