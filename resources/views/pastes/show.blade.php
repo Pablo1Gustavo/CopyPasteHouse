@@ -74,6 +74,14 @@
 
             <h2 class="text-xl font-bold mb-4">{{ $paste->title }}</h2>
 
+            <div class="mb-3">
+                <span class="text-gray-400 text-sm">
+                    By <span class="text-blue-400 font-semibold">{{ $paste->user ? $paste->user->username : 'Anonymous' }}</span>
+                    <span class="mx-2">•</span>
+                    {{ $paste->created_at->diffForHumans() }}
+                </span>
+            </div>
+
             <div class="flex flex-wrap gap-2 mb-4">
                 @if($paste->syntaxHighlight)
                     <span class="border border-gray-600 px-3 py-1 text-xs rounded">
@@ -125,8 +133,21 @@
             </div>
 
             <div class="mt-4 flex items-center justify-between">
-                <div class="text-sm text-gray-400">
-                    {{ $paste->likes_count ?? 0 }} likes • {{ $paste->access_count ?? 0 }} views
+                <div class="flex items-center gap-4">
+                    @auth
+                        <button 
+                            onclick="toggleLike()"
+                            id="likeButton"
+                            class="flex items-center gap-2 {{ $userHasLiked ? 'text-red-400' : 'text-gray-400' }} hover:text-red-400 transition"
+                        >
+                            <span id="likeIcon">{{ $userHasLiked ? '❤️' : '🤍' }}</span>
+                            <span id="likeCount">{{ $paste->likes_count ?? 0 }}</span>
+                        </button>
+                    @else
+                        <span class="text-gray-400">🤍 {{ $paste->likes_count ?? 0 }}</span>
+                    @endauth
+                    <span class="text-gray-400">👁️ {{ $paste->access_count ?? 0 }} views</span>
+                    <span class="text-gray-400">💬 {{ $comments->count() }} comments</span>
                 </div>
                 
                 <div class="flex gap-2">
@@ -170,6 +191,98 @@
                 </div>
             </div>
         </div>
+
+        <!-- Comments Section -->
+        <div class="bg-gray-800 shadow-md rounded-lg p-6 mt-6">
+            <h2 class="text-xl font-bold mb-4">Comments ({{ $comments->count() }})</h2>
+
+            <!-- Comments List -->
+            @forelse($comments as $comment)
+                <div class="border-b border-gray-700 pb-4 mb-4 last:border-0">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="font-semibold text-blue-400">{{ $comment->user->username }}</span>
+                            <span class="text-gray-500 text-sm ml-2">{{ $comment->created_at->diffForHumans() }}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            @auth
+                                <button 
+                                    onclick="toggleCommentLike('{{ $comment->id }}')"
+                                    id="commentLikeButton-{{ $comment->id }}"
+                                    class="text-red-500 hover:text-red-400 text-sm"
+                                >
+                                    <span id="commentLikeIcon-{{ $comment->id }}">
+                                        {{ in_array($comment->id, $likedCommentIds) ? '❤️' : '🤍' }}
+                                    </span>
+                                    <span id="commentLikeCount-{{ $comment->id }}">{{ $comment->likes_count }}</span>
+                                </button>
+                            @else
+                                <span class="text-gray-500 text-sm">🤍 {{ $comment->likes_count }}</span>
+                            @endauth
+                        </div>
+                    </div>
+
+                    @if($comment->syntax_highlight_id)
+                        <pre><code class="language-{{ $comment->syntaxHighlight->code ?? 'plaintext' }} rounded">{{ $comment->content }}</code></pre>
+                    @else
+                        <p class="text-gray-300">{{ $comment->content }}</p>
+                    @endif
+                </div>
+            @empty
+                <p class="text-gray-500 text-center py-4">No comments yet. Be the first to comment!</p>
+            @endforelse
+
+            <!-- Comment Form -->
+            @auth
+                <div class="mt-6">
+                    <h3 class="text-lg font-semibold mb-3">Add a Comment</h3>
+                    <form action="{{ route('pastes.comments.store', $paste->id) }}" method="POST">
+                        @csrf
+                        <div class="mb-4">
+                            <textarea 
+                                name="content" 
+                                rows="4" 
+                                class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white"
+                                placeholder="Write your comment..."
+                                required
+                            >{{ old('content') }}</textarea>
+                            @error('content')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2">Syntax Highlight (optional)</label>
+                            <select 
+                                name="syntax_highlight_id" 
+                                class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2"
+                            >
+                                <option value="">None</option>
+                                @foreach($syntaxHighlights as $highlight)
+                                    <option value="{{ $highlight->id }}" {{ old('syntax_highlight_id') == $highlight->id ? 'selected' : '' }}>
+                                        {{ $highlight->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <button 
+                            type="submit"
+                            class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded"
+                        >
+                            Post Comment
+                        </button>
+                    </form>
+                </div>
+            @else
+                <div class="mt-6 text-center">
+                    <p class="text-gray-500 mb-3">You must be logged in to comment.</p>
+                    <a href="{{ route('login') }}" class="text-blue-400 hover:underline">Login</a>
+                    or
+                    <a href="{{ route('register') }}" class="text-blue-400 hover:underline">Register</a>
+                </div>
+            @endauth
+        </div>
     </div>
 
     <script>
@@ -180,6 +293,52 @@
             const code = @json($paste->content);
             navigator.clipboard.writeText(code).then(() => {
                 alert('Copied to clipboard!');
+            });
+        }
+
+        // Toggle paste like
+        function toggleLike() {
+            fetch('{{ route('pastes.like', $paste->id) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const icon = document.getElementById('likeIcon');
+                const count = document.getElementById('likeCount');
+                
+                icon.textContent = data.liked ? '❤️' : '🤍';
+                count.textContent = data.count;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to toggle like. Please try again.');
+            });
+        }
+
+        // Toggle comment like
+        function toggleCommentLike(commentId) {
+            fetch(`/comments/${commentId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const icon = document.getElementById(`commentLikeIcon-${commentId}`);
+                const count = document.getElementById(`commentLikeCount-${commentId}`);
+                
+                icon.textContent = data.liked ? '❤️' : '🤍';
+                count.textContent = data.count;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to toggle like. Please try again.');
             });
         }
     </script>

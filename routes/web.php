@@ -30,6 +30,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/pastes/{paste}', [PasteController::class, 'update'])->name('pastes.update');
     Route::delete('/pastes/{paste}', [PasteController::class, 'destroy'])->name('pastes.destroy');
     Route::post('/pastes/{paste}/like', [PasteController::class, 'toggleLike'])->name('pastes.like');
+    
+    // Comments
+    Route::post('/pastes/{paste}/comments', [PasteController::class, 'storeComment'])->name('pastes.comments.store');
+    Route::post('/comments/{comment}/like', [PasteController::class, 'toggleCommentLike'])->name('comments.like');
 });
 
 // Public paste viewing (no auth required)
