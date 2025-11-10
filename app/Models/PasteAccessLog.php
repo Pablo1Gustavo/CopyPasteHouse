@@ -34,4 +34,57 @@ class PasteAccessLog extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get most viewed pastes
+     */
+    public static function getMostViewedPastes(int $limit = 10)
+    {
+        return self::select('paste_id', \DB::raw('count(*) as views_count'))
+            ->groupBy('paste_id')
+            ->orderByDesc('views_count')
+            ->limit($limit)
+            ->with('paste')
+            ->get();
+    }
+
+    /**
+     * Get access logs by paste
+     */
+    public static function getAccessByPaste(string $pasteId)
+    {
+        return self::with('user')
+            ->where('paste_id', $pasteId)
+            ->orderByDesc('access_date')
+            ->get();
+    }
+
+    /**
+     * Get access logs by user
+     */
+    public static function getAccessByUser(string $userId)
+    {
+        return self::with('paste')
+            ->where('user_id', $userId)
+            ->orderByDesc('access_date')
+            ->get();
+    }
+
+    /**
+     * Get unique visitors count for a paste
+     */
+    public static function getUniqueVisitorsCount(string $pasteId): int
+    {
+        return self::where('paste_id', $pasteId)
+            ->distinct('ip')
+            ->count('ip');
+    }
+
+    /**
+     * Get access count for a paste
+     */
+    public static function getAccessCount(string $pasteId): int
+    {
+        return self::where('paste_id', $pasteId)->count();
+    }
 }

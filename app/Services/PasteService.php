@@ -32,7 +32,7 @@ class PasteService
                 $q->where('syntax_highlight_id', $filters['syntax_highlight_id'])
             )
             ->when(isset($filters['title']), fn (Builder $q) =>
-                $q->whereLike('title', '%' . $filters['title'] . '%')
+                $q->where('title', 'like', '%' . $filters['title'] . '%')
             )
             ->when(isset($filters['created_after']), fn (Builder $q) =>
                 $q->where('created_at', '>=', $filters['created_after'])
@@ -45,11 +45,13 @@ class PasteService
         {
             $tags = $filters['tags'];
             $tags = array_filter($tags, fn ($item) => !empty($item));
-            $tags = array_map(Str::slug(...), $tags);
+            $tags = array_map(static fn ($item) => Str::slug($item), $tags);
             $tags = array_unique($tags);
 
-            $pattern = '%,' . implode(',%,', $tags) . ',%';
-            $query->where('tags', 'LIKE', $pattern);
+            foreach ($tags as $tag)
+            {
+                $query->where('tags', 'LIKE', '%,' . $tag . ',%');
+            }
         }
 
         return $query->get();
@@ -63,13 +65,23 @@ class PasteService
         string $userAgent
     ): Paste {
         $paste->makeVisible('password');
-
+      
         if (isset($paste->password) && !Hash::check($password, $paste->password))
         {
             throw new WrongPastePassword;
         }
 
-        DB::transaction(function () use ($user, $paste, $ipAddress, $userAgent)
+        $paste->loadMissing([
+            'syntaxHighlight',
+            'user',
+        ])->loadCount([
+            'likes',
+            'accessLogs AS access_count',
+        ]);
+
+        $destroyedPaste = null;
+
+        DB::transaction(function () use (&$destroyedPaste, $user, $paste, $ipAddress, $userAgent)
         {
             $paste->accessLogs()->create([
                 'user_id'    => $user?->id,
@@ -82,6 +94,7 @@ class PasteService
             }
         });
 
+        $paste->makeHidden('password');
         $paste
             ->makeHidden('password')
             ->load([
@@ -155,7 +168,7 @@ class PasteService
         return $paste->likes()->where('user_id', $user->id)->exists();
     }
 
-    public function toggleLike(Paste $paste, User $user): bool
+    public function toggleLike(Paste $paste, User $user): array
     {
         $existingLike = $this->isLikedByUser($paste, $user);
 
@@ -168,7 +181,10 @@ class PasteService
             $paste->likes()->create(['user_id' => $user->id]);
         }
 
-        return !$existingLike;
+        return [
+            'liked' => !$existingLike,
+            'count' => $paste->likes()->count()
+        ];
     }
 
     public function delete(Paste $paste): void

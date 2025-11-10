@@ -28,4 +28,26 @@ class CommentLike extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get recent likes
+     */
+    public static function getRecentLikes(int $limit = 20)
+    {
+        return self::with(['comment', 'user'])
+            ->orderByDesc('liked_at')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
+     * Get likes by user
+     */
+    public static function getLikesByUser(string $userId)
+    {
+        return self::with('comment')
+            ->where('user_id', $userId)
+            ->orderByDesc('liked_at')
+            ->get();
+    }
 }

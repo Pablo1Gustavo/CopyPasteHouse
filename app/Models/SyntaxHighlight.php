@@ -10,7 +10,7 @@ class SyntaxHighlight extends Model
 {
     use HasUuids, SoftDeletes, HasFactory;
 
-    protected $fillable = ['name', 'extension'];
+    protected $fillable = ['label', 'value'];
     public $timestamps = false;
 
     public function pastes(): HasMany
