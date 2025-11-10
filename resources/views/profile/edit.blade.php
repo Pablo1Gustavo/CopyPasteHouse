@@ -13,11 +13,14 @@
             <a href="{{ route('pastes.create') }}" class="text-xl font-bold text-white hover:text-gray-300">CopyPasteHouse</a>
             <div class="flex items-center gap-4 text-sm">
                 
-                <a href="{{ route('pastes.create') }}" class="border border-green-500 text-green-500 px-4 py-2 hover:bg-green-500 hover:text-white transition">
-                    + NEW PASTE
+                <a href="{{ route('pastes.archive') }}" class="border border-blue-500 text-blue-500 px-4 py-2 hover:bg-blue-500 hover:text-white transition uppercase">
+                    📚 Public Pastes
                 </a>
-                <a href="{{ route('pastes.index') }}" class="border border-gray-400 px-4 py-2 hover:bg-gray-700 transition">
-                    MY PASTES
+                <a href="{{ route('pastes.create') }}" class="border border-green-500 text-green-500 px-4 py-2 hover:bg-green-500 hover:text-white transition uppercase">
+                    + New Paste
+                </a>
+                <a href="{{ route('pastes.index') }}" class="border border-gray-400 px-4 py-2 hover:bg-gray-700 transition uppercase">
+                    My Pastes
                 </a>
 
                 <a href="{{ route('profile.edit') }}" class="text-gray-300 hover:text-white">
