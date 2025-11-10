@@ -30,6 +30,13 @@ Route::middleware('auth')->group(function () {
     Route::put('/pastes/{paste}', [PasteController::class, 'update'])->name('pastes.update');
     Route::delete('/pastes/{paste}', [PasteController::class, 'destroy'])->name('pastes.destroy');
     Route::post('/pastes/{paste}/like', [PasteController::class, 'toggleLike'])->name('pastes.like');
+    
+    //Profile
+    Route::get('/profile', function () {return view('profile.edit');})->name('profile.edit');
+    // TODO: O back-end para esta rota precisa ser criado.
+    Route::put('/profile', function () {return redirect()->route('profile.edit');})->name('profile.update');
+    // TODO: O back-end para esta rota precisa ser criado.
+    Route::put('/password', function () {return redirect()->route('profile.edit');})->name('password.update');
 });
 
 // Public paste viewing (no auth required)
