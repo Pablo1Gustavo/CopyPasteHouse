@@ -18,7 +18,7 @@ class ExpirationTimeController extends Controller
     ) {
     }
 
-    #[Get('','expiration-times.list')]
+    #[Get('','api.expiration-times.list')]
     public function list(): JsonResponse
     {
         $expirationTimes = $this->service->list();
@@ -26,7 +26,7 @@ class ExpirationTimeController extends Controller
         return response()->json($expirationTimes, Response::HTTP_OK);
     }
 
-    #[Post('', 'expiration-times.create')]
+    #[Post('', 'api.expiration-times.create')]
     public function create(CreateExpirationTimeRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -39,7 +39,7 @@ class ExpirationTimeController extends Controller
         ], Response::HTTP_CREATED);
     }
 
-    #[Delete('{expirationTime}', 'expiration-times.delete')]
+    #[Delete('{expirationTime}', 'api.expiration-times.delete')]
     public function delete(ExpirationTime $expirationTime): JsonResponse
     {
         $this->service->delete($expirationTime);

@@ -42,7 +42,7 @@
                             <div class="flex flex-wrap gap-2 mt-2 text-xs">
                                 @if($paste->syntaxHighlight)
                                     <span class="border {{ $borderClass }} {{ $textClass }} px-2 py-1 rounded">
-                                        📄 {{ $paste->syntaxHighlight->label }}
+                                        📄 {{ $paste->syntaxHighlight->name }}
                                     </span>
                                 @endif
                                 <span class="border {{ $borderClass }} {{ $textClass }} px-2 py-1 rounded">

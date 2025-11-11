@@ -31,7 +31,9 @@ class AdminController extends Controller
      */
     public function showUser(string $id)
     {
-        $user = $this->userService->show($id);
+        $user = \App\Models\User::with(['settings', 'pastes', 'comments'])
+            ->withCount(['pastes', 'comments', 'likes'])
+            ->find($id);
 
         if (!$user) {
             return redirect()->route('admin.users')->with('error', 'User not found');

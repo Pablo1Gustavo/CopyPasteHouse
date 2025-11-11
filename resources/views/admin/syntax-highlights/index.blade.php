@@ -50,10 +50,10 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex gap-2">
-                                <a href="{{ route('syntax-highlights.edit', $highlight) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
+                                <a href="{{ route('syntax-highlights.edit', $highlight->id) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm">
                                     Edit
                                 </a>
-                                <form method="POST" action="{{ route('syntax-highlights.destroy', $highlight) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this syntax highlight?');">
+                                <form method="POST" action="{{ route('syntax-highlights.destroy', $highlight->id) }}" class="inline" onsubmit="return confirm('Are you sure you want to delete this syntax highlight?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">

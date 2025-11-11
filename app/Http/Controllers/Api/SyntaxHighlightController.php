@@ -18,7 +18,7 @@ class SyntaxHighlightController extends Controller
     ) {
     }
 
-    #[Get('', 'syntax-highlights.list')]
+    #[Get('', 'api.syntax-highlights.list')]
     public function list(): JsonResponse
     {
         $syntaxHighlights = $this->service->list();
@@ -26,7 +26,7 @@ class SyntaxHighlightController extends Controller
         return response()->json($syntaxHighlights, Response::HTTP_OK);
     }
 
-    #[Post('', 'syntax-highlights.create')]
+    #[Post('', 'api.syntax-highlights.create')]
     public function create(CreateSyntaxHighlightRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -39,7 +39,7 @@ class SyntaxHighlightController extends Controller
         ], Response::HTTP_CREATED);
     }
 
-    #[Put('{syntaxHighlight}', 'syntax-highlights.edit')]
+    #[Put('{syntaxHighlight}', 'api.syntax-highlights.edit')]
     public function edit(SyntaxHighlight $syntaxHighlight, UpdateSyntaxHighlightRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -51,7 +51,7 @@ class SyntaxHighlightController extends Controller
         ], Response::HTTP_OK);
     }
 
-    #[Delete('{syntaxHighlight}', 'syntax-highlights.delete')]
+    #[Delete('{syntaxHighlight}', 'api.syntax-highlights.delete')]
     public function delete(SyntaxHighlight $syntaxHighlight): JsonResponse
     {
         $this->service->delete($syntaxHighlight);

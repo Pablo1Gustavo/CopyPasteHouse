@@ -36,11 +36,12 @@ class PasteAccessLog extends Model
     }
 
     /**
-     * Get most viewed pastes
+     * Get the most viewed pastes (trending)
      */
     public static function getMostViewedPastes(int $limit = 10)
     {
         return self::select('paste_id', \DB::raw('count(*) as views_count'))
+            ->whereHas('paste') // Only include access logs for non-deleted pastes
             ->groupBy('paste_id')
             ->orderByDesc('views_count')
             ->limit($limit)

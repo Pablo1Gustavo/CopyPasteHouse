@@ -30,8 +30,11 @@
 
             <div class="bg-gray-700 rounded-lg p-4 mb-8">
                 <p class="text-gray-300 text-sm mb-2">You're about to burn this paste:</p>
-                <p class="text-white font-bold text-xl font-mono">{{ $paste->id }}</p>
-                <p class="text-gray-400 text-sm mt-2">"{{ $paste->title }}"</p>
+                <p class="text-white font-bold text-xl">{{ $paste->title }}</p>
+                @if($paste->user)
+                    <p class="text-gray-400 text-sm mt-2">Created by {{ $paste->user->username }}</p>
+                @endif
+                <p class="text-gray-500 text-xs mt-1">{{ $paste->created_at->diffForHumans() }}</p>
             </div>
 
             <div class="flex gap-4 justify-center">

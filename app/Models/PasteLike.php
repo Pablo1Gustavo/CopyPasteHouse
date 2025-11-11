@@ -35,6 +35,7 @@ class PasteLike extends Model
     public static function getMostLikedPastes(int $limit = 10)
     {
         return self::select('paste_id', \DB::raw('count(*) as likes_count'))
+            ->whereHas('paste') // Only include likes for non-deleted pastes
             ->groupBy('paste_id')
             ->orderByDesc('likes_count')
             ->limit($limit)
@@ -48,6 +49,7 @@ class PasteLike extends Model
     public static function getRecentLikes(int $limit = 20)
     {
         return self::with(['paste', 'user'])
+            ->whereHas('paste') // Only include likes for non-deleted pastes
             ->orderByDesc('liked_at')
             ->limit($limit)
             ->get();

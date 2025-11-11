@@ -28,7 +28,7 @@
                         <button @click="open = !open" class="border border-purple-500 text-purple-500 px-4 py-2 hover:bg-purple-500 hover:text-white transition uppercase">
                             ⚙️ Admin
                         </button>
-                                                <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-56 rounded-md shadow-lg {{ $isLight ? 'bg-white' : 'bg-gray-800' }} ring-1 ring-black ring-opacity-5">
+                        <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-56 rounded-md shadow-lg {{ $isLight ? 'bg-white' : 'bg-gray-800' }} ring-1 ring-black ring-opacity-5 z-50">
                             <a href="{{ route('admin.statistics') }}" class="block px-4 py-2 {{ $isLight ? 'text-gray-900 hover:bg-gray-100' : 'text-white hover:bg-gray-700' }}">📊 Statistics</a>
                             <a href="{{ route('admin.users') }}" class="block px-4 py-2 {{ $isLight ? 'text-gray-900 hover:bg-gray-100' : 'text-white hover:bg-gray-700' }}">👥 Users</a>
                             <a href="{{ route('admin.comments') }}" class="block px-4 py-2 {{ $isLight ? 'text-gray-900 hover:bg-gray-100' : 'text-white hover:bg-gray-700' }}">💬 Comments</a>

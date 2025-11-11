@@ -27,7 +27,7 @@
         <div class="{{ $cardClass }} rounded-lg p-6">
             @if(isset($paste->destroyed) && $paste->destroyed)
                 <div class="bg-yellow-900 border border-yellow-700 text-yellow-200 px-4 py-3 mb-4 rounded">
-                    ⚠️ This paste was set to "destroy on open" and has been permanently deleted after this view.
+                    ⚠️ This paste was set to "destroy on open" and will be permanently deleted after this view.
                 </div>
             @endif
 
@@ -62,7 +62,7 @@
             <div class="flex flex-wrap gap-2 mb-4">
                 @if($paste->syntaxHighlight)
                     <span class="{{ $isLight ? 'border-gray-300 text-gray-700' : 'border-gray-600 text-white' }} border px-3 py-1 text-xs rounded">
-                        📄 {{ $paste->syntaxHighlight->label }}
+                        📄 {{ $paste->syntaxHighlight->name }}
                     </span>
                 @endif
                 <span class="{{ $isLight ? 'border-gray-300 text-gray-700' : 'border-gray-600 text-white' }} border px-3 py-1 text-xs rounded">
@@ -99,18 +99,22 @@
 
             <div class="mt-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    @auth
-                        <button 
-                            onclick="toggleLike()"
-                            id="likeButton"
-                            class="flex items-center gap-2 {{ $userHasLiked ? 'text-red-400' : 'text-gray-400' }} hover:text-red-400 transition"
-                        >
-                            <span id="likeIcon">{{ $userHasLiked ? '❤️' : '🤍' }}</span>
-                            <span id="likeCount">{{ $paste->likes_count ?? 0 }}</span>
-                        </button>
+                    @if(!isset($paste->destroyed) || !$paste->destroyed)
+                        @auth
+                            <button 
+                                onclick="toggleLike()"
+                                id="likeButton"
+                                class="flex items-center gap-2 {{ $userHasLiked ? 'text-red-400' : 'text-gray-400' }} hover:text-red-400 transition"
+                            >
+                                <span id="likeIcon">{{ $userHasLiked ? '❤️' : '🤍' }}</span>
+                                <span id="likeCount">{{ $paste->likes_count ?? 0 }}</span>
+                            </button>
+                        @else
+                            <span class="text-gray-400">🤍 {{ $paste->likes_count ?? 0 }}</span>
+                        @endauth
                     @else
                         <span class="text-gray-400">🤍 {{ $paste->likes_count ?? 0 }}</span>
-                    @endauth
+                    @endif
                     <span class="text-gray-400">👁️ {{ $paste->access_count ?? 0 }} views</span>
                     <span class="text-gray-400">💬 {{ $comments->count() }} comments</span>
                 </div>
@@ -208,55 +212,57 @@
             </div>
 
             <!-- Comment Form -->
-            @auth
-                <div class="mt-6">
-                    <h3 class="text-lg font-semibold mb-3 {{ $textClass }}">Add a Comment</h3>
-                    <form action="{{ route('pastes.comments.store', $paste->id) }}" method="POST">
-                        @csrf
-                        <div class="mb-4">
-                            <textarea 
-                                name="content" 
-                                rows="4" 
-                                class="w-full {{ $isLight ? 'bg-gray-100 border-gray-300 text-gray-900' : 'bg-gray-700 border-gray-600 text-white' }} border rounded px-3 py-2"
-                                placeholder="Write your comment..."
-                                required
-                            >{{ old('content') }}</textarea>
-                            @error('content')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
+            @if(!isset($paste->destroyed) || !$paste->destroyed)
+                @auth
+                    <div class="mt-6">
+                        <h3 class="text-lg font-semibold mb-3 {{ $textClass }}">Add a Comment</h3>
+                        <form action="{{ route('pastes.comments.store', $paste->id) }}" method="POST">
+                            @csrf
+                            <div class="mb-4">
+                                <textarea 
+                                    name="content" 
+                                    rows="4" 
+                                    class="w-full {{ $isLight ? 'bg-gray-100 border-gray-300 text-gray-900' : 'bg-gray-700 border-gray-600 text-white' }} border rounded px-3 py-2"
+                                    placeholder="Write your comment..."
+                                    required
+                                >{{ old('content') }}</textarea>
+                                @error('content')
+                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2 {{ $textClass }}">Syntax Highlight (optional)</label>
-                            <select 
-                                name="syntax_highlight_id" 
-                                class="w-full {{ $isLight ? 'bg-gray-100 border-gray-300 text-gray-900' : 'bg-gray-700 border-gray-600 text-white' }} border rounded px-3 py-2"
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2 {{ $textClass }}">Syntax Highlight (optional)</label>
+                                <select 
+                                    name="syntax_highlight_id" 
+                                    class="w-full {{ $isLight ? 'bg-gray-100 border-gray-300 text-gray-900' : 'bg-gray-700 border-gray-600 text-white' }} border rounded px-3 py-2"
+                                >
+                                    <option value="">None</option>
+                                    @foreach($syntaxHighlights as $highlight)
+                                        <option value="{{ $highlight->id }}" {{ old('syntax_highlight_id') == $highlight->id ? 'selected' : '' }}>
+                                            {{ $highlight->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <button 
+                                type="submit"
+                                class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded"
                             >
-                                <option value="">None</option>
-                                @foreach($syntaxHighlights as $highlight)
-                                    <option value="{{ $highlight->id }}" {{ old('syntax_highlight_id') == $highlight->id ? 'selected' : '' }}>
-                                        {{ $highlight->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <button 
-                            type="submit"
-                            class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded"
-                        >
-                            Post Comment
-                        </button>
-                    </form>
-                </div>
-            @else
-                <div class="mt-6 text-center">
-                    <p class="text-gray-500 mb-3">You must be logged in to comment.</p>
-                    <a href="{{ route('login') }}" class="text-blue-400 hover:underline">Login</a>
-                    or
-                    <a href="{{ route('register') }}" class="text-blue-400 hover:underline">Register</a>
-                </div>
-            @endauth
+                                Post Comment
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <div class="mt-6 text-center">
+                        <p class="text-gray-500 mb-3">You must be logged in to comment.</p>
+                        <a href="{{ route('login') }}" class="text-blue-400 hover:underline">Login</a>
+                        or
+                        <a href="{{ route('register') }}" class="text-blue-400 hover:underline">Register</a>
+                    </div>
+                @endauth
+            @endif
         </div>
     </div>
 
@@ -272,6 +278,7 @@
             });
         }
 
+        @if(!isset($paste->destroyed) || !$paste->destroyed)
         // Toggle paste like
         function toggleLike() {
             fetch('{{ route('pastes.like', $paste->id) }}', {
@@ -294,6 +301,7 @@
                 alert('Failed to toggle like. Please try again.');
             });
         }
+        @endif
 
         // Toggle comment like
         function toggleCommentLike(commentId) {

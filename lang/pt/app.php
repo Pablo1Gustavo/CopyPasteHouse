@@ -3,9 +3,9 @@
 return [
     // Header
     'app_name' => 'CopyPasteHouse',
-    'public_pastes' => 'Pastas Públicas',
-    'new_paste' => 'Nova Pasta',
-    'my_pastes' => 'Minhas Pastas',
+    'public_pastes' => 'Colas Públicas',
+    'new_paste' => 'Nova Cola',
+    'my_pastes' => 'Minhas Colas',
     'login' => 'Entrar',
     'signup' => 'Cadastrar',
     'logout' => 'Sair',
@@ -33,8 +33,8 @@ return [
     'theme_dark' => 'Escuro',
     
     // Paste Form
-    'edit_paste' => 'Editar pasta',
-    'paste_content' => 'Conteúdo da Pasta',
+    'edit_paste' => 'Editar cola',
+    'paste_content' => 'Conteúdo da Cola',
     'title' => 'Título',
     'syntax_highlighting' => 'Destaque de Sintaxe',
     'tags' => 'Tags',
@@ -47,7 +47,7 @@ return [
     'leave_empty_password' => 'Deixe vazio para manter a senha atual',
     'generate_password' => 'Gerar senha aleatória',
     'destroy_on_open' => 'Destruir ao abrir',
-    'update_paste' => 'Atualizar Pasta',
+    'update_paste' => 'Atualizar Cola',
     'create_paste' => 'Criar Pasta',
     'cancel' => 'Cancelar',
     

@@ -60,6 +60,10 @@ class PasteController extends Controller
             }
         }
 
+        // Ensure boolean fields are set (checkboxes don't send value when unchecked)
+        $data['destroy_on_open'] = $data['destroy_on_open'] ?? false;
+        $data['listable'] = $data['listable'] ?? true; // Default to true for new pastes
+
         // Extract tag_ids before creating paste
         $tagIds = $data['tag_ids'] ?? [];
         unset($data['tag_ids']);
@@ -176,13 +180,21 @@ class PasteController extends Controller
                 'likes_count' => $paste->likes_count ?? 0,
                 'access_count' => $accessCount,
                 'user_id' => $paste->user_id,
+                'user' => $paste->user,
                 'destroyed' => true
             ];
 
-            // Use the service method to properly handle cascading deletes
-            $this->pasteService->delete($paste);
+            // Delete the paste directly (without ownership validation for burn-after-reading)
+            $paste->delete();
 
-            return view('pastes.show', ['paste' => $displayPaste]);
+            // Return view with all necessary variables
+            return view('pastes.show', [
+                'paste' => $displayPaste,
+                'comments' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20), // Empty paginator for burned paste
+                'userHasLiked' => false,
+                'likedCommentIds' => [],
+                'syntaxHighlights' => $this->syntaxHighlightService->list()
+            ]);
         }
 
         $paste->setAttribute('access_count', $accessCount);
@@ -246,6 +258,10 @@ class PasteController extends Controller
                 $data['expiration'] = null;
             }
         }
+
+        // Ensure boolean fields are set (checkboxes don't send value when unchecked)
+        $data['destroy_on_open'] = $data['destroy_on_open'] ?? false;
+        $data['listable'] = $data['listable'] ?? false;
         
         // Extract tag_ids before updating paste
         $tagIds = $data['tag_ids'] ?? [];

@@ -66,7 +66,7 @@
                         <option value="">📄 All Languages</option>
                         @foreach($syntaxHighlights as $syntax)
                             <option value="{{ $syntax->id }}" {{ request('syntax') == $syntax->id ? 'selected' : '' }}>
-                                {{ $syntax->label }}
+                                {{ $syntax->name }}
                             </option>
                         @endforeach
                     </select>
@@ -117,7 +117,7 @@
                     @endphp
                     @if($activeSyntax)
                         <span class="{{ $isLight ? 'bg-gray-200 text-gray-800' : 'bg-gray-700 text-gray-200' }} px-2 py-1 rounded">
-                            Language: {{ $activeSyntax->label }}
+                            Language: {{ $activeSyntax->name }}
                         </span>
                     @endif
                 @endif
@@ -142,7 +142,7 @@
                             <div class="flex flex-wrap gap-2 mt-2 text-xs">
                                 @if($paste->syntaxHighlight)
                                     <span class="border {{ $borderClass }} {{ $textClass }} px-2 py-1 rounded">
-                                        📄 {{ $paste->syntaxHighlight->label }}
+                                        📄 {{ $paste->syntaxHighlight->name }}
                                     </span>
                                 @endif
                                 <span class="border {{ $borderClass }} {{ $textClass }} px-2 py-1 rounded">

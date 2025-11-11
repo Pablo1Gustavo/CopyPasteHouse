@@ -27,6 +27,7 @@ class UpdatePasteRequest extends FormRequest
             'listable'            => ['nullable', 'boolean'],
             'password'            => ['nullable', 'string', 'min:8', 'max:255'],
             'expiration'          => ['nullable', 'string'],
+            'destroy_on_open'     => ['nullable', 'boolean'],
         ];
     }
 

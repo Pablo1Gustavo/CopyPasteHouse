@@ -115,6 +115,7 @@
                     </div>
                     <div id="selected_tags" class="mt-2 flex flex-wrap gap-2"></div>
                     <div class="text-xs {{ $mutedClass }} mt-1">
+                        Don't see the tag you need? 
                         <a href="{{ route('tags.create') }}" class="text-blue-400 hover:text-blue-300" target="_blank">Create a new tag</a>
                     </div>
                 </div>
