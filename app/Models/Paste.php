@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 namespace App\Models;
 
-use App\Casts\CommaSeparatedStringListCast;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
@@ -61,6 +60,7 @@ class Paste extends Model
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class, 'paste_tag')
-            ->withTimestamps();
+            ->withTimestamps()
+            ->using(PasteTag::class);
     }
 }

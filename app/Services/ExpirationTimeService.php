@@ -42,15 +42,8 @@ class ExpirationTimeService
         return $expirationTime;
     }
 
-    public function delete(string $id): bool
+    public function delete(ExpirationTime $expirationTime): void
     {
-        $expirationTime = ExpirationTime::find($id);
-        
-        if (!$expirationTime) {
-            return false;
-        }
-        
         $expirationTime->delete();
-        return true;
     }
 }

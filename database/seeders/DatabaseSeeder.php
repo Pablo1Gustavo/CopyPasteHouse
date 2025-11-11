@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Models\ExpirationTime;
-use App\Models\SyntaxHighlight;
-use App\Models\User;
+use App\Models\{ExpirationTime, SyntaxHighlight, User};
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -40,7 +38,8 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Markdown', 'extension' => 'markdown'],
         ];
 
-        foreach ($syntaxHighlights as $highlight) {
+        foreach ($syntaxHighlights as $highlight)
+        {
             SyntaxHighlight::firstOrCreate(
                 ['extension' => $highlight['extension']],
                 ['name' => $highlight['name']]
@@ -59,7 +58,8 @@ class DatabaseSeeder extends Seeder
             ['minutes' => 525600, 'label' => '1 Year'],
         ];
 
-        foreach ($expirationTimes as $time) {
+        foreach ($expirationTimes as $time)
+        {
             ExpirationTime::firstOrCreate(
                 ['minutes' => $time['minutes']],
                 ['label' => $time['label']]
@@ -71,18 +71,18 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@example.com'],
             [
                 'username' => 'admin',
-                'password' => bcrypt('password'),
+                'password' => bcrypt('admin'),
                 'is_admin' => true,
                 'email_verified_at' => now(),
             ]
         );
 
         // Seed test regular user
-        $testUser = User::firstOrCreate(
-            ['email' => 'user@example.com'],
+        $guest = User::firstOrCreate(
+            ['email' => 'guest@example.com'],
             [
-                'username' => 'testuser',
-                'password' => bcrypt('password'),
+                'username' => 'guest',
+                'password' => bcrypt('guest'),
                 'is_admin' => false,
                 'email_verified_at' => now(),
             ]
@@ -100,7 +100,8 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Security', 'slug' => 'security', 'description' => 'Security-related code and best practices', 'color' => '#DC2626', 'is_public' => true],
         ];
 
-        foreach ($defaultTags as $tagData) {
+        foreach ($defaultTags as $tagData)
+        {
             \App\Models\Tag::firstOrCreate(
                 ['slug' => $tagData['slug']],
                 [
@@ -120,11 +121,12 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Work Project', 'slug' => 'work-project', 'description' => 'Code for work projects', 'color' => '#84CC16'],
         ];
 
-        foreach ($userTags as $tagData) {
+        foreach ($userTags as $tagData)
+        {
             \App\Models\Tag::firstOrCreate(
                 ['slug' => $tagData['slug']],
                 [
-                    'user_id' => $testUser->id,
+                    'user_id' => $guest->id,
                     'name' => $tagData['name'],
                     'description' => $tagData['description'],
                     'color' => $tagData['color'],

@@ -1,8 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\SyntaxHighlight;
 use App\Services\SyntaxHighlightService;
 use Illuminate\Http\Request;
 
@@ -10,7 +11,8 @@ class SyntaxHighlightController extends Controller
 {
     public function __construct(
         private SyntaxHighlightService $syntaxHighlightService
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of syntax highlights
@@ -52,7 +54,8 @@ class SyntaxHighlightController extends Controller
     {
         $highlight = $this->syntaxHighlightService->show($syntax_highlight);
 
-        if (!$highlight) {
+        if (!$highlight)
+        {
             return redirect()->route('syntax-highlights.index')
                 ->with('error', 'Syntax highlight not found');
         }
@@ -67,7 +70,8 @@ class SyntaxHighlightController extends Controller
     {
         $highlight = $this->syntaxHighlightService->show($syntax_highlight);
 
-        if (!$highlight) {
+        if (!$highlight)
+        {
             return redirect()->route('syntax-highlights.index')
                 ->with('error', 'Syntax highlight not found');
         }
@@ -86,11 +90,12 @@ class SyntaxHighlightController extends Controller
     /**
      * Remove the specified syntax highlight
      */
-    public function destroy(string $syntax_highlight)
+    public function destroy(SyntaxHighlight $syntaxHighlight)
     {
-        $result = $this->syntaxHighlightService->delete($syntax_highlight);
+        $result = $this->syntaxHighlightService->delete($syntaxHighlight);
 
-        if (!$result) {
+        if (!$result)
+        {
             return redirect()->route('syntax-highlights.index')
                 ->with('error', 'Syntax highlight not found or cannot be deleted');
         }

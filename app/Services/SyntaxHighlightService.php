@@ -41,14 +41,8 @@ class SyntaxHighlightService
         return $syntaxHighlight;
     }
 
-    public function delete(string $id): bool
+    public function delete(SyntaxHighlight $syntaxHighlight): bool
     {
-        $syntaxHighlight = SyntaxHighlight::find($id);
-        
-        if (!$syntaxHighlight) {
-            return false;
-        }
-        
         $syntaxHighlight->delete();
         return true;
     }

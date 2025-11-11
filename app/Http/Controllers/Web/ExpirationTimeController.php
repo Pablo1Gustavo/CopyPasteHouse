@@ -1,8 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\ExpirationTime;
 use App\Services\ExpirationTimeService;
 use Illuminate\Http\Request;
 
@@ -10,7 +11,8 @@ class ExpirationTimeController extends Controller
 {
     public function __construct(
         private ExpirationTimeService $expirationTimeService
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of expiration times
@@ -52,7 +54,8 @@ class ExpirationTimeController extends Controller
     {
         $expirationTime = $this->expirationTimeService->show($expiration_time);
 
-        if (!$expirationTime) {
+        if (!$expirationTime)
+        {
             return redirect()->route('expiration-times.index')
                 ->with('error', 'Expiration time not found');
         }
@@ -67,7 +70,8 @@ class ExpirationTimeController extends Controller
     {
         $expirationTime = $this->expirationTimeService->show($expiration_time);
 
-        if (!$expirationTime) {
+        if (!$expirationTime)
+        {
             return redirect()->route('expiration-times.index')
                 ->with('error', 'Expiration time not found');
         }
@@ -86,14 +90,9 @@ class ExpirationTimeController extends Controller
     /**
      * Remove the specified expiration time
      */
-    public function destroy(string $expiration_time)
+    public function destroy(ExpirationTime $expirationTime)
     {
-        $result = $this->expirationTimeService->delete($expiration_time);
-
-        if (!$result) {
-            return redirect()->route('expiration-times.index')
-                ->with('error', 'Expiration time not found or cannot be deleted');
-        }
+        $result = $this->expirationTimeService->delete($expirationTime);
 
         return redirect()->route('expiration-times.index')
             ->with('success', 'Expiration time deleted successfully');

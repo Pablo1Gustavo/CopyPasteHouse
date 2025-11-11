@@ -11,21 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tags', function (Blueprint $table) {
-            $table->id();
+        Schema::create('tags', function (Blueprint $table)
+        {
+            $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->text('description')->nullable();
-            $table->string('color', 7)->default('#3B82F6'); // Hex color code
+            $table->string('color', 7)->default('#3B82F6');
             $table->boolean('is_public')->default(true);
             $table->timestamps();
             $table->softDeletes();
         });
 
-        // Create pivot table for pastes and tags
-        Schema::create('paste_tag', function (Blueprint $table) {
-            $table->id();
+        Schema::create('paste_tag', function (Blueprint $table)
+        {
+            $table->uuid('id')->primary();
             $table->foreignUuid('paste_id')->constrained()->onDelete('cascade');
             $table->foreignId('tag_id')->constrained()->onDelete('cascade');
             $table->timestamps();
