@@ -70,27 +70,10 @@ npm run dev
 
 Access the application at http://127.0.0.1:8000
 
-## Features
+## API Documentation
 
-- User authentication (register, login, logout)
-- Create, view, edit, and delete pastes
-- Syntax highlighting support
-- Paste expiration options
-- Password-protected pastes
-- Public and unlisted pastes
-- Tags for organizing pastes
-- Destroy on first view option
+The API is documented using Swagger/OpenAPI. To access the interactive API documentation:
 
-## License
+1. Make sure the application is running (`php artisan serve`)
+2. Visit: **http://127.0.0.1:8000/api/documentation**
 
-Open-source software licensed under the MIT license.
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

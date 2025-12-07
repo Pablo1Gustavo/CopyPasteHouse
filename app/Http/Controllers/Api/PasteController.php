@@ -8,9 +8,11 @@ use App\Models\Paste;
 use App\Services\PasteService;
 use Illuminate\Http\{JsonResponse, Response};
 use Illuminate\Support\Facades\{Auth};
+use OpenApi\Attributes as OA;
 use Spatie\RouteAttributes\Attributes\{Delete, Get, Middleware, Post, Prefix, Put};
 
 #[Prefix('pastes')]
+#[OA\Tag(name: 'Pastes', description: 'Paste management operations')]
 class PasteController extends Controller
 {
     public function __construct(
@@ -19,6 +21,35 @@ class PasteController extends Controller
     }
 
     #[Get('', 'api.pastes.list')]
+    #[OA\Get(
+        path: '/api/pastes',
+        summary: 'List all pastes',
+        description: 'Retrieve a paginated list of pastes with optional filters',
+        tags: ['Pastes'],
+        parameters: [
+            new OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'per_page', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'search', in: 'query', required: false, schema: new OA\Schema(type: 'string'))
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'List of pastes',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'data', type: 'array', items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: 'id', type: 'integer'),
+                                new OA\Property(property: 'title', type: 'string'),
+                                new OA\Property(property: 'content', type: 'string'),
+                                new OA\Property(property: 'created_at', type: 'string', format: 'date-time')
+                            ]
+                        ))
+                    ]
+                )
+            )
+        ]
+    )]
     public function list(ListPastesRequest $request): JsonResponse
     {
         $filters = $request->validated();
@@ -28,6 +59,21 @@ class PasteController extends Controller
     }
 
     #[Get('my-pastes', 'api.pastes.my-pastes', 'auth:sanctum')]
+    #[OA\Get(
+        path: '/api/pastes/my-pastes',
+        summary: 'List authenticated user pastes',
+        description: 'Retrieve a list of pastes created by the authenticated user',
+        security: [['sanctum' => []]],
+        tags: ['Pastes'],
+        parameters: [
+            new OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'per_page', in: 'query', required: false, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'List of user pastes'),
+            new OA\Response(response: 401, description: 'Unauthenticated')
+        ]
+    )]
     public function myPastes(ListPastesRequest $request): JsonResponse
     {
         $filters = $request->validated();
@@ -39,6 +85,32 @@ class PasteController extends Controller
     }
 
     #[Get('{paste}', 'api.pastes.show')]
+    #[OA\Get(
+        path: '/api/pastes/{paste}',
+        summary: 'Get a specific paste',
+        description: 'Retrieve details of a specific paste by ID',
+        tags: ['Pastes'],
+        parameters: [
+            new OA\Parameter(name: 'paste', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'password', in: 'query', required: false, schema: new OA\Schema(type: 'string'))
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Paste details',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'id', type: 'integer'),
+                        new OA\Property(property: 'title', type: 'string'),
+                        new OA\Property(property: 'content', type: 'string'),
+                        new OA\Property(property: 'created_at', type: 'string', format: 'date-time')
+                    ]
+                )
+            ),
+            new OA\Response(response: 404, description: 'Paste not found'),
+            new OA\Response(response: 403, description: 'Password required')
+        ]
+    )]
     public function show(Paste $paste, AccessPasteRequest $request): JsonResponse
     {
         $password = $request->validated("password") ?? null;
@@ -55,6 +127,38 @@ class PasteController extends Controller
     }
 
     #[Post('', 'api.pastes.create')]
+    #[OA\Post(
+        path: '/api/pastes',
+        summary: 'Create a new paste',
+        description: 'Create a new paste with title and content',
+        tags: ['Pastes'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['title', 'content'],
+                properties: [
+                    new OA\Property(property: 'title', type: 'string', example: 'My Code Snippet'),
+                    new OA\Property(property: 'content', type: 'string', example: 'console.log("Hello World")'),
+                    new OA\Property(property: 'syntax_highlight_id', type: 'integer', nullable: true),
+                    new OA\Property(property: 'expiration_time_id', type: 'integer', nullable: true),
+                    new OA\Property(property: 'password', type: 'string', nullable: true)
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Paste created successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'paste', type: 'object'),
+                        new OA\Property(property: 'message', type: 'string', example: 'Paste created successfully!')
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: 'Validation error')
+        ]
+    )]
     public function create(CreatePasteRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -68,6 +172,41 @@ class PasteController extends Controller
     }
 
     #[Put('{paste}', 'api.pastes.edit', 'auth:sanctum')]
+    #[OA\Put(
+        path: '/api/pastes/{paste}',
+        summary: 'Update a paste',
+        description: 'Update an existing paste (requires authentication)',
+        security: [['sanctum' => []]],
+        tags: ['Pastes'],
+        parameters: [
+            new OA\Parameter(name: 'paste', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'title', type: 'string'),
+                    new OA\Property(property: 'content', type: 'string'),
+                    new OA\Property(property: 'syntax_highlight_id', type: 'integer', nullable: true)
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Paste updated successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'paste', type: 'object'),
+                        new OA\Property(property: 'message', type: 'string', example: 'Paste updated successfully!')
+                    ]
+                )
+            ),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 404, description: 'Paste not found')
+        ]
+    )]
     public function edit(Paste $paste, UpdatePasteRequest $request): JsonResponse
     {
         $editedPaste = $this->service->edit($paste, $request->validated());
@@ -79,6 +218,30 @@ class PasteController extends Controller
     }
 
     #[Delete('{paste}', 'api.pastes.delete', 'auth:sanctum')]
+    #[OA\Delete(
+        path: '/api/pastes/{paste}',
+        summary: 'Delete a paste',
+        description: 'Delete an existing paste (requires authentication)',
+        security: [['sanctum' => []]],
+        tags: ['Pastes'],
+        parameters: [
+            new OA\Parameter(name: 'paste', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Paste deleted successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'Paste deleted successfully!')
+                    ]
+                )
+            ),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 404, description: 'Paste not found')
+        ]
+    )]
     public function delete(Paste $paste): JsonResponse
     {
         $this->service->delete($paste);
@@ -88,8 +251,30 @@ class PasteController extends Controller
         ], Response::HTTP_OK);
     }
 
-    #[Middleware('auth:sanctum')]
     #[Post('{paste}/like', 'api.pastes.toggle-like', 'auth:sanctum')]
+    #[OA\Post(
+        path: '/api/pastes/{paste}/like',
+        summary: 'Toggle like on paste',
+        description: 'Like or unlike a paste (requires authentication)',
+        security: [['sanctum' => []]],
+        tags: ['Pastes'],
+        parameters: [
+            new OA\Parameter(name: 'paste', in: 'path', required: true, schema: new OA\Schema(type: 'integer'))
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Like toggled successfully',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'Paste liked!')
+                    ]
+                )
+            ),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 404, description: 'Paste not found')
+        ]
+    )]
     public function toggleLike(Paste $paste): JsonResponse
     {
         $user = Auth::user();
