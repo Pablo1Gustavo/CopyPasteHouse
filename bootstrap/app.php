@@ -4,6 +4,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\{Exceptions, Middleware};
 use Illuminate\Http\{JsonResponse, Request, Response};
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -17,14 +18,20 @@ return Application::configure(basePath: dirname(__DIR__))
     {
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\SendLog::class,
         ]);
-        
+
         $middleware->alias([
             'admin' => \App\Http\Middleware\IsAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void
     {
+        $exceptions->report(function (Throwable $e)
+        {
+            Log::error("Ocorreu um erro inesperado: {$e->getMessage()}", ['exception' => $e]);
+        })->stop();
+
         $exceptions->render(function (ModelNotFoundException $e, Request $request)
         {
             if ($request->expectsJson())
