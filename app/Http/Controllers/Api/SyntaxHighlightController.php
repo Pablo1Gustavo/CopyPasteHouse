@@ -22,7 +22,7 @@ class SyntaxHighlightController extends Controller
 
     #[Get('', 'api.syntax-highlights.list')]
     #[OA\Get(
-        path: '/api/syntax-highlights',
+        path: '/syntax-highlights',
         summary: 'List all syntax highlights',
         description: 'Retrieve a list of available syntax highlighting options',
         security: [['sanctum' => []]],
@@ -54,7 +54,7 @@ class SyntaxHighlightController extends Controller
 
     #[Post('', 'api.syntax-highlights.create')]
     #[OA\Post(
-        path: '/api/syntax-highlights',
+        path: '/syntax-highlights',
         summary: 'Create a syntax highlight',
         description: 'Create a new syntax highlighting option',
         security: [['sanctum' => []]],
@@ -98,7 +98,7 @@ class SyntaxHighlightController extends Controller
 
     #[Put('{syntaxHighlight}', 'api.syntax-highlights.edit')]
     #[OA\Put(
-        path: '/api/syntax-highlights/{syntaxHighlight}',
+        path: '/syntax-highlights/{syntaxHighlight}',
         summary: 'Update a syntax highlight',
         description: 'Update an existing syntax highlighting option',
         security: [['sanctum' => []]],
@@ -143,7 +143,7 @@ class SyntaxHighlightController extends Controller
 
     #[Delete('{syntaxHighlight}', 'api.syntax-highlights.delete')]
     #[OA\Delete(
-        path: '/api/syntax-highlights/{syntaxHighlight}',
+        path: '/syntax-highlights/{syntaxHighlight}',
         summary: 'Delete a syntax highlight',
         description: 'Delete an existing syntax highlighting option',
         security: [['sanctum' => []]],

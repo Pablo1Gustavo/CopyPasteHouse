@@ -12,14 +12,14 @@
         }
     ],
     "paths": {
-        "/api/login": {
+        "/login": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "User login",
                 "description": "Authenticate a user and return an access token",
-                "operationId": "222b2625838e3c57e017987f73598fda",
+                "operationId": "67d6d0fdd54fba132e1b6f55ca254183",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -72,14 +72,14 @@
                 }
             }
         },
-        "/api/logout": {
+        "/logout": {
             "post": {
                 "tags": [
                     "Authentication"
                 ],
                 "summary": "User logout",
                 "description": "Logout the authenticated user and revoke all tokens",
-                "operationId": "ad65cbbd4e9f201619eae184a5961a98",
+                "operationId": "28d48c13fca984400ac8de99f54ee13a",
                 "responses": {
                     "200": {
                         "description": "Logout successful",
@@ -108,14 +108,14 @@
                 ]
             }
         },
-        "/api/expiration-times": {
+        "/expiration-times": {
             "get": {
                 "tags": [
                     "Expiration Times"
                 ],
                 "summary": "List all expiration times",
                 "description": "Retrieve a list of available expiration time options for pastes",
-                "operationId": "753e29a3ff64e56c1eb72b3d4cf2cc2b",
+                "operationId": "1c78cec2b5a6926971c2ecd2150e87dd",
                 "responses": {
                     "200": {
                         "description": "List of expiration times",
@@ -157,7 +157,7 @@
                 ],
                 "summary": "Create an expiration time",
                 "description": "Create a new expiration time option",
-                "operationId": "2285b61b9c3503b6335486dbb5c04569",
+                "operationId": "bc4d95836af52189d29e0d6b4a7e10b7",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -217,14 +217,14 @@
                 ]
             }
         },
-        "/api/expiration-times/{expirationTime}": {
+        "/expiration-times/{expirationTime}": {
             "delete": {
                 "tags": [
                     "Expiration Times"
                 ],
                 "summary": "Delete an expiration time",
                 "description": "Delete an existing expiration time option",
-                "operationId": "d2a288c90de9710831d818daca038714",
+                "operationId": "b45fdbb9a5c6f0fe48efeb8e2d8b3f1c",
                 "parameters": [
                     {
                         "name": "expirationTime",
@@ -266,14 +266,14 @@
                 ]
             }
         },
-        "/api/pastes/{paste}/comments": {
+        "/pastes/{paste}/comments": {
             "get": {
                 "tags": [
                     "Paste Comments"
                 ],
                 "summary": "List comments on a paste",
                 "description": "Retrieve all comments for a specific paste",
-                "operationId": "e524da34621683c784153e1b4596cbb8",
+                "operationId": "d76b4ea3570e4c7545223b7386fda556",
                 "parameters": [
                     {
                         "name": "paste",
@@ -332,7 +332,7 @@
                 ],
                 "summary": "Create a comment",
                 "description": "Add a new comment to a paste",
-                "operationId": "945ad751799495d14d6ca0b74ae82d5a",
+                "operationId": "4b3543396631f4ffb7d04a81d342613f",
                 "parameters": [
                     {
                         "name": "paste",
@@ -393,14 +393,14 @@
                 ]
             }
         },
-        "/api/pastes/comments/{comment}": {
+        "/pastes/comments/{comment}": {
             "put": {
                 "tags": [
                     "Paste Comments"
                 ],
                 "summary": "Update a comment",
                 "description": "Update an existing comment (user must be comment owner)",
-                "operationId": "43ca70893e982304337ec94fc66bfaf7",
+                "operationId": "eb088a0d32987dab8194a7339df89300",
                 "parameters": [
                     {
                         "name": "comment",
@@ -469,7 +469,7 @@
                 ],
                 "summary": "Delete a comment",
                 "description": "Delete an existing comment (user must be comment owner)",
-                "operationId": "acc2d14fa877a0b77348fe3d483be99a",
+                "operationId": "480473366cafd3dc21bf7b20099e597b",
                 "parameters": [
                     {
                         "name": "comment",
@@ -514,14 +514,14 @@
                 ]
             }
         },
-        "/api/pastes/comments/{comment}/like": {
+        "/pastes/comments/{comment}/like": {
             "patch": {
                 "tags": [
                     "Paste Comments"
                 ],
                 "summary": "Toggle like on comment",
                 "description": "Like or unlike a comment",
-                "operationId": "ba4466f9a4ecc2e3fd4725e5d5d49683",
+                "operationId": "03cdc8660ce67e75e726167f4d515fac",
                 "parameters": [
                     {
                         "name": "comment",
@@ -563,14 +563,14 @@
                 ]
             }
         },
-        "/api/pastes": {
+        "/pastes": {
             "get": {
                 "tags": [
                     "Pastes"
                 ],
                 "summary": "List all pastes",
                 "description": "Retrieve a paginated list of pastes with optional filters",
-                "operationId": "a21cd60419051a6c111aff454c616912",
+                "operationId": "24b693a2e24b6551837d2d7ff5b2c721",
                 "parameters": [
                     {
                         "name": "page",
@@ -639,7 +639,7 @@
                 ],
                 "summary": "Create a new paste",
                 "description": "Create a new paste with title and content",
-                "operationId": "32fa3d3def6bc606d038d644c3dd61fe",
+                "operationId": "caef8867e233cd292a34e4f09a3734cf",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -702,14 +702,14 @@
                 }
             }
         },
-        "/api/pastes/my-pastes": {
+        "/pastes/my-pastes": {
             "get": {
                 "tags": [
                     "Pastes"
                 ],
                 "summary": "List authenticated user pastes",
                 "description": "Retrieve a list of pastes created by the authenticated user",
-                "operationId": "3864c481c71ac9f3b3fa055c4205a180",
+                "operationId": "0c933e76106618965382b2c29e51bad5",
                 "parameters": [
                     {
                         "name": "page",
@@ -743,14 +743,14 @@
                 ]
             }
         },
-        "/api/pastes/{paste}": {
+        "/pastes/{paste}": {
             "get": {
                 "tags": [
                     "Pastes"
                 ],
                 "summary": "Get a specific paste",
                 "description": "Retrieve details of a specific paste by ID",
-                "operationId": "08aefd13b4ec72c867d0dffa131eaffb",
+                "operationId": "45d3c037bbcc1970ae6cfb7059557110",
                 "parameters": [
                     {
                         "name": "paste",
@@ -809,7 +809,7 @@
                 ],
                 "summary": "Update a paste",
                 "description": "Update an existing paste (requires authentication)",
-                "operationId": "fdf3684f430c409cd5c7f990daa84f32",
+                "operationId": "03f7d35819b788dda21c3f4531e54a02",
                 "parameters": [
                     {
                         "name": "paste",
@@ -884,7 +884,7 @@
                 ],
                 "summary": "Delete a paste",
                 "description": "Delete an existing paste (requires authentication)",
-                "operationId": "8f3b3ebc47022d0ce51c0e2b90410fcb",
+                "operationId": "fb61f1f4f9050d835337b3df7d04a268",
                 "parameters": [
                     {
                         "name": "paste",
@@ -929,14 +929,14 @@
                 ]
             }
         },
-        "/api/pastes/{paste}/like": {
+        "/pastes/{paste}/like": {
             "post": {
                 "tags": [
                     "Pastes"
                 ],
                 "summary": "Toggle like on paste",
                 "description": "Like or unlike a paste (requires authentication)",
-                "operationId": "973715b09a1bdfe8c6b5e113998427ba",
+                "operationId": "70a7c39c86b5eda33c13620e0070df50",
                 "parameters": [
                     {
                         "name": "paste",
@@ -978,14 +978,14 @@
                 ]
             }
         },
-        "/api/syntax-highlights": {
+        "/syntax-highlights": {
             "get": {
                 "tags": [
                     "Syntax Highlights"
                 ],
                 "summary": "List all syntax highlights",
                 "description": "Retrieve a list of available syntax highlighting options",
-                "operationId": "021bba541b19f46a283eda6feeef5f08",
+                "operationId": "6434d8c5db69cb7c1f4fa611b05713ce",
                 "responses": {
                     "200": {
                         "description": "List of syntax highlights",
@@ -1027,7 +1027,7 @@
                 ],
                 "summary": "Create a syntax highlight",
                 "description": "Create a new syntax highlighting option",
-                "operationId": "d032e083f328ee1350603f98f757d670",
+                "operationId": "4fbb0aa8763fd186ead1bc15e5950a19",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1086,14 +1086,14 @@
                 ]
             }
         },
-        "/api/syntax-highlights/{syntaxHighlight}": {
+        "/syntax-highlights/{syntaxHighlight}": {
             "put": {
                 "tags": [
                     "Syntax Highlights"
                 ],
                 "summary": "Update a syntax highlight",
                 "description": "Update an existing syntax highlighting option",
-                "operationId": "9df7e46b279888ff3282d0f6783f8ae7",
+                "operationId": "c300473ebe0d20c07c0f72c607f7d129",
                 "parameters": [
                     {
                         "name": "syntaxHighlight",
@@ -1163,7 +1163,7 @@
                 ],
                 "summary": "Delete a syntax highlight",
                 "description": "Delete an existing syntax highlighting option",
-                "operationId": "a80986b6dbb3779bf15dde84a6e3c099",
+                "operationId": "1ad3884e5c902e4f9154e156ad2e40da",
                 "parameters": [
                     {
                         "name": "syntaxHighlight",

@@ -22,7 +22,7 @@ class ExpirationTimeController extends Controller
 
     #[Get('','api.expiration-times.list')]
     #[OA\Get(
-        path: '/api/expiration-times',
+        path: '/expiration-times',
         summary: 'List all expiration times',
         description: 'Retrieve a list of available expiration time options for pastes',
         security: [['sanctum' => []]],
@@ -54,7 +54,7 @@ class ExpirationTimeController extends Controller
 
     #[Post('', 'api.expiration-times.create')]
     #[OA\Post(
-        path: '/api/expiration-times',
+        path: '/expiration-times',
         summary: 'Create an expiration time',
         description: 'Create a new expiration time option',
         security: [['sanctum' => []]],
@@ -98,7 +98,7 @@ class ExpirationTimeController extends Controller
 
     #[Delete('{expirationTime}', 'api.expiration-times.delete')]
     #[OA\Delete(
-        path: '/api/expiration-times/{expirationTime}',
+        path: '/expiration-times/{expirationTime}',
         summary: 'Delete an expiration time',
         description: 'Delete an existing expiration time option',
         security: [['sanctum' => []]],

@@ -20,7 +20,7 @@ class AuthController extends Controller
 
     #[Post('login', 'auth.login')]
     #[OA\Post(
-        path: '/api/login',
+        path: '/login',
         summary: 'User login',
         description: 'Authenticate a user and return an access token',
         tags: ['Authentication'],
@@ -74,7 +74,7 @@ class AuthController extends Controller
 
     #[Post('logout', 'auth.logout', ['auth:sanctum'])]
     #[OA\Post(
-        path: '/api/logout',
+        path: '/logout',
         summary: 'User logout',
         description: 'Logout the authenticated user and revoke all tokens',
         security: [['sanctum' => []]],

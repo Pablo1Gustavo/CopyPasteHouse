@@ -22,7 +22,7 @@ class PasteController extends Controller
 
     #[Get('', 'api.pastes.list')]
     #[OA\Get(
-        path: '/api/pastes',
+        path: '/pastes',
         summary: 'List all pastes',
         description: 'Retrieve a paginated list of pastes with optional filters',
         tags: ['Pastes'],
@@ -60,7 +60,7 @@ class PasteController extends Controller
 
     #[Get('my-pastes', 'api.pastes.my-pastes', 'auth:sanctum')]
     #[OA\Get(
-        path: '/api/pastes/my-pastes',
+        path: '/pastes/my-pastes',
         summary: 'List authenticated user pastes',
         description: 'Retrieve a list of pastes created by the authenticated user',
         security: [['sanctum' => []]],
@@ -86,7 +86,7 @@ class PasteController extends Controller
 
     #[Get('{paste}', 'api.pastes.show')]
     #[OA\Get(
-        path: '/api/pastes/{paste}',
+        path: '/pastes/{paste}',
         summary: 'Get a specific paste',
         description: 'Retrieve details of a specific paste by ID',
         tags: ['Pastes'],
@@ -128,7 +128,7 @@ class PasteController extends Controller
 
     #[Post('', 'api.pastes.create')]
     #[OA\Post(
-        path: '/api/pastes',
+        path: '/pastes',
         summary: 'Create a new paste',
         description: 'Create a new paste with title and content',
         tags: ['Pastes'],
@@ -173,7 +173,7 @@ class PasteController extends Controller
 
     #[Put('{paste}', 'api.pastes.edit', 'auth:sanctum')]
     #[OA\Put(
-        path: '/api/pastes/{paste}',
+        path: '/pastes/{paste}',
         summary: 'Update a paste',
         description: 'Update an existing paste (requires authentication)',
         security: [['sanctum' => []]],
@@ -219,7 +219,7 @@ class PasteController extends Controller
 
     #[Delete('{paste}', 'api.pastes.delete', 'auth:sanctum')]
     #[OA\Delete(
-        path: '/api/pastes/{paste}',
+        path: '/pastes/{paste}',
         summary: 'Delete a paste',
         description: 'Delete an existing paste (requires authentication)',
         security: [['sanctum' => []]],
@@ -253,7 +253,7 @@ class PasteController extends Controller
 
     #[Post('{paste}/like', 'api.pastes.toggle-like', 'auth:sanctum')]
     #[OA\Post(
-        path: '/api/pastes/{paste}/like',
+        path: '/pastes/{paste}/like',
         summary: 'Toggle like on paste',
         description: 'Like or unlike a paste (requires authentication)',
         security: [['sanctum' => []]],

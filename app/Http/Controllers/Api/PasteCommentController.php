@@ -23,7 +23,7 @@ class PasteCommentController extends Controller
 
     #[Get('{paste}/comments', 'api.pastes.comments.list')]
     #[OA\Get(
-        path: '/api/pastes/{paste}/comments',
+        path: '/pastes/{paste}/comments',
         summary: 'List comments on a paste',
         description: 'Retrieve all comments for a specific paste',
         security: [['sanctum' => []]],
@@ -58,7 +58,7 @@ class PasteCommentController extends Controller
 
     #[Post('{paste}/comments', 'api.pastes.comments.create')]
     #[OA\Post(
-        path: '/api/pastes/{paste}/comments',
+        path: '/pastes/{paste}/comments',
         summary: 'Create a comment',
         description: 'Add a new comment to a paste',
         security: [['sanctum' => []]],
@@ -102,7 +102,7 @@ class PasteCommentController extends Controller
 
     #[Put('comments/{comment}', 'api.pastes.comments.edit')]
     #[OA\Put(
-        path: '/api/pastes/comments/{comment}',
+        path: '/pastes/comments/{comment}',
         summary: 'Update a comment',
         description: 'Update an existing comment (user must be comment owner)',
         security: [['sanctum' => []]],
@@ -148,7 +148,7 @@ class PasteCommentController extends Controller
 
     #[Delete('comments/{comment}', 'api.pastes.comments.delete')]
     #[OA\Delete(
-        path: '/api/pastes/comments/{comment}',
+        path: '/pastes/comments/{comment}',
         summary: 'Delete a comment',
         description: 'Delete an existing comment (user must be comment owner)',
         security: [['sanctum' => []]],
@@ -184,7 +184,7 @@ class PasteCommentController extends Controller
 
     #[Patch('comments/{comment}/like', 'api.pastes.comments.like')]
     #[OA\Patch(
-        path: '/api/pastes/comments/{comment}/like',
+        path: '/pastes/comments/{comment}/like',
         summary: 'Toggle like on comment',
         description: 'Like or unlike a comment',
         security: [['sanctum' => []]],
